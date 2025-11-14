@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Plus, FileText, Code, Link as LinkIcon, Bug, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { FileText, Code, Link as LinkIcon, Bug, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getDomainConfig } from "@/components/training/domain-badge";
+import { CreateNoteDialog } from "@/components/training/create-note-dialog";
+import { CreateSnippetDialog } from "@/components/training/create-snippet-dialog";
+import { CreateResourceDialog } from "@/components/training/create-resource-dialog";
+import { CreateBugDialog } from "@/components/training/create-bug-dialog";
 
 export default function DomainPage() {
   const params = useParams();
@@ -114,10 +117,7 @@ export default function DomainPage() {
 
         <TabsContent value="notes" className="space-y-4">
           <div className="flex justify-end">
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              新建笔记
-            </Button>
+            <CreateNoteDialog domain={domain} onSuccess={() => window.location.reload()} />
           </div>
           {notes.length === 0 ? (
             <Card className="p-8 text-center text-gray-500">
@@ -146,10 +146,7 @@ export default function DomainPage() {
 
         <TabsContent value="snippets" className="space-y-4">
           <div className="flex justify-end">
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              新建代码片段
-            </Button>
+            <CreateSnippetDialog domain={domain} onSuccess={() => window.location.reload()} />
           </div>
           {snippets.length === 0 ? (
             <Card className="p-8 text-center text-gray-500">
@@ -179,10 +176,7 @@ export default function DomainPage() {
 
         <TabsContent value="resources" className="space-y-4">
           <div className="flex justify-end">
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              添加资源
-            </Button>
+            <CreateResourceDialog domain={domain} onSuccess={() => window.location.reload()} />
           </div>
           {resources.length === 0 ? (
             <Card className="p-8 text-center text-gray-500">
@@ -217,10 +211,7 @@ export default function DomainPage() {
 
         <TabsContent value="bugs" className="space-y-4">
           <div className="flex justify-end">
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              记录 Bug
-            </Button>
+            <CreateBugDialog domain={domain} onSuccess={() => window.location.reload()} />
           </div>
           {bugs.length === 0 ? (
             <Card className="p-8 text-center text-gray-500">
