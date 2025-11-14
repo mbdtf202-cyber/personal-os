@@ -3,8 +3,38 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+// Training System Enums
+enum TrainingDomain {
+  PRODUCT        // 产品设计
+  PROJECT_MGMT   // 项目管理
+  FRONTEND       // 前端开发
+  BACKEND        // 后端开发
+  TESTING        // 测试
+  DEVOPS         // 运维/DevOps
+  AI_COLLAB      // AI 协作
+}
+
+enum TrainingSessionType {
+  DESIGN         // 设计
+  CODING         // 编码
+  CODE_REVIEW    // 代码审查
+  DEBUGGING      // 调试排错
+  REFACTOR       // 重构
+  READING        // 阅读学习
+  DEPLOYMENT     // 部署
+  REFLECTION     // 复盘总结
+  OTHER          // 其他
+}
+
+enum TrainingPlanStatus {
+  DRAFT          // 草稿
+  ACTIVE         // 进行中
+  COMPLETED      // 已完成
+  PAUSED         // 已暂停
 }
 
 model User {
@@ -26,6 +56,9 @@ model User {
   projects          Project[]
   bookmarks         Bookmark[]
   newsSources       NewsSource[]
+  trainingPlans     TrainingPlan[]
+  trainingSessions  TrainingSession[]
+  trainingReviews   TrainingWeeklyReview[]
 }
 
 model Tag {
@@ -103,9 +136,10 @@ model Post {
   updatedAt       DateTime @updatedAt
   publishedAt     DateTime?
 
-  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags  Tag[]
-  links PostLink[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags             Tag[]
+  links            PostLink[]
+  trainingSessions TrainingSession[]
 
   @@index([userId, status])
   @@index([category])
@@ -264,8 +298,9 @@ model Project {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags Tag[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags             Tag[]
+  trainingSessions TrainingSession[]
 
   @@index([userId, status])
   @@index([isPublic])
@@ -296,4 +331,95 @@ model Bookmark {
   @@index([userId, category])
   @@index([status, isFavorite])
   @@index([userId, type])
+}
+
+// Training System Models
+model TrainingPlan {
+  id          String              @id @default(cuid())
+  userId      String
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?
+  domains     String              // JSON array of TrainingDomain
+  
+  startDate   DateTime?
+  endDate     DateTime?
+  weeks       Int?
+  status      TrainingPlanStatus  @default(DRAFT)
+  
+  targetHoursPerWeek Int?
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  sessions      TrainingSession[]
+  weeklyReviews TrainingWeeklyReview[]
+  
+  @@index([userId, status])
+}
+
+model TrainingSession {
+  id          String              @id @default(cuid())
+  userId      String
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  planId      String?
+  plan        TrainingPlan?       @relation(fields: [planId], references: [id], onDelete: SetNull)
+  
+  date        DateTime
+  title       String
+  type        TrainingSessionType
+  durationMin Int?
+  
+  domains     String              // JSON array of TrainingDomain
+  skillTags   String              // JSON array of strings
+  
+  description String?
+  
+  projectId   String?
+  project     Project?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  blogPostId  String?
+  blogPost    Post?               @relation(fields: [blogPostId], references: [id], onDelete: SetNull)
+  
+  aiInvolved  Boolean             @default(false)
+  aiTools     String              // JSON array of strings
+  aiNotes     String?
+  
+  outcomeScore Int?
+  notesMd      String?
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  
+  @@index([userId, date])
+  @@index([planId])
+  @@index([projectId])
+  @@index([type])
+}
+
+model TrainingWeeklyReview {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  planId      String?
+  plan        TrainingPlan?  @relation(fields: [planId], references: [id], onDelete: SetNull)
+  
+  weekIndex   Int
+  startDate   DateTime
+  endDate     DateTime
+  
+  summaryMd   String
+  lessonsMd   String
+  nextFocusMd String
+  
+  metricsJson Json?
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  @@unique([planId, weekIndex])
+  @@index([userId, startDate])
 }

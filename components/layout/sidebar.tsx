@@ -12,10 +12,12 @@ import {
   TrendingUp,
   FolderKanban,
   Bookmark,
+  GraduationCap,
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Training', href: '/training', icon: GraduationCap },
   { name: 'Health', href: '/health', icon: Heart },
   { name: 'Blog', href: '/blog', icon: FileText },
   { name: 'News', href: '/news', icon: Newspaper },

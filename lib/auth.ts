@@ -42,3 +42,11 @@ export async function getCurrentUserId(): Promise<string> {
 export async function requireAuth(): Promise<string> {
   return ensureDefaultUser()
 }
+
+export async function getCurrentUser() {
+  const userId = await getCurrentUserId();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  return user;
+}
