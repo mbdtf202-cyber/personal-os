@@ -4,13 +4,14 @@ import { getCurrentUser } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { domain: string } }
+  { params }: { params: Promise<{ domain: string }> }
 ) {
   try {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const stats = await getDomainStats(user.id, params.domain);
+    const { domain } = await params;
+    const stats = await getDomainStats(user.id, domain);
     return NextResponse.json(stats);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
