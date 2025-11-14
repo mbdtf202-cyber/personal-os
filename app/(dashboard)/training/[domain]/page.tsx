@@ -250,7 +250,8 @@ export default function DomainPage() {
               ))}
             </div>
           )}
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
