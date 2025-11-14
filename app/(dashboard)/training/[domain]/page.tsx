@@ -69,7 +69,7 @@ export default function DomainPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 text-gray-600 mb-1">
             <FileText className="w-4 h-4" />
@@ -77,13 +77,15 @@ export default function DomainPage() {
           </div>
           <div className="text-2xl font-bold">{stats?.notes || 0}</div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 text-gray-600 mb-1">
-            <Code className="w-4 h-4" />
-            <span className="text-sm">代码片段</span>
-          </div>
-          <div className="text-2xl font-bold">{stats?.snippets || 0}</div>
-        </Card>
+        {(domain === "FRONTEND" || domain === "BACKEND" || domain === "TESTING" || domain === "DEVOPS") && (
+          <Card className="p-4">
+            <div className="flex items-center gap-2 text-gray-600 mb-1">
+              <Code className="w-4 h-4" />
+              <span className="text-sm">代码片段</span>
+            </div>
+            <div className="text-2xl font-bold">{stats?.snippets || 0}</div>
+          </Card>
+        )}
         <Card className="p-4">
           <div className="flex items-center gap-2 text-gray-600 mb-1">
             <LinkIcon className="w-4 h-4" />
@@ -91,28 +93,27 @@ export default function DomainPage() {
           </div>
           <div className="text-2xl font-bold">{stats?.resources || 0}</div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 text-gray-600 mb-1">
-            <Bug className="w-4 h-4" />
-            <span className="text-sm">Bug</span>
-          </div>
-          <div className="text-2xl font-bold">{stats?.bugs || 0}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 text-gray-600 mb-1">
-            <TrendingUp className="w-4 h-4" />
-            <span className="text-sm">技能等级</span>
-          </div>
-          <div className="text-2xl font-bold">{stats?.avgLevel || 0}</div>
-        </Card>
+        {(domain === "FRONTEND" || domain === "BACKEND" || domain === "TESTING" || domain === "DEVOPS") && (
+          <Card className="p-4">
+            <div className="flex items-center gap-2 text-gray-600 mb-1">
+              <Bug className="w-4 h-4" />
+              <span className="text-sm">Bug</span>
+            </div>
+            <div className="text-2xl font-bold">{stats?.bugs || 0}</div>
+          </Card>
+        )}
       </div>
 
       <Tabs defaultValue="notes" className="w-full">
         <TabsList>
           <TabsTrigger value="notes">笔记</TabsTrigger>
-          <TabsTrigger value="snippets">代码片段</TabsTrigger>
+          {(domain === "FRONTEND" || domain === "BACKEND" || domain === "TESTING" || domain === "DEVOPS") && (
+            <TabsTrigger value="snippets">代码片段</TabsTrigger>
+          )}
           <TabsTrigger value="resources">资源</TabsTrigger>
-          <TabsTrigger value="bugs">Bug</TabsTrigger>
+          {(domain === "FRONTEND" || domain === "BACKEND" || domain === "TESTING" || domain === "DEVOPS") && (
+            <TabsTrigger value="bugs">Bug</TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="notes" className="space-y-4">
@@ -144,10 +145,11 @@ export default function DomainPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="snippets" className="space-y-4">
-          <div className="flex justify-end">
-            <CreateSnippetDialog domain={domain} onSuccess={() => window.location.reload()} />
-          </div>
+        {(domain === "FRONTEND" || domain === "BACKEND" || domain === "TESTING" || domain === "DEVOPS") && (
+          <TabsContent value="snippets" className="space-y-4">
+            <div className="flex justify-end">
+              <CreateSnippetDialog domain={domain} onSuccess={() => window.location.reload()} />
+            </div>
           {snippets.length === 0 ? (
             <Card className="p-8 text-center text-gray-500">
               还没有代码片段
@@ -172,7 +174,8 @@ export default function DomainPage() {
               ))}
             </div>
           )}
-        </TabsContent>
+          </TabsContent>
+        )}
 
         <TabsContent value="resources" className="space-y-4">
           <div className="flex justify-end">
@@ -209,10 +212,11 @@ export default function DomainPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="bugs" className="space-y-4">
-          <div className="flex justify-end">
-            <CreateBugDialog domain={domain} onSuccess={() => window.location.reload()} />
-          </div>
+        {(domain === "FRONTEND" || domain === "BACKEND" || domain === "TESTING" || domain === "DEVOPS") && (
+          <TabsContent value="bugs" className="space-y-4">
+            <div className="flex justify-end">
+              <CreateBugDialog domain={domain} onSuccess={() => window.location.reload()} />
+            </div>
           {bugs.length === 0 ? (
             <Card className="p-8 text-center text-gray-500">
               还没有 Bug 记录
