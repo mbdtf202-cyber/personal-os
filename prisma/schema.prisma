@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  avatar    String?
+  timezone  String   @default("Asia/Shanghai")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  healthLogs        HealthDailyLog[]
+  habits            Habit[]
+  posts             Post[]
+  socialPosts       SocialPost[]
+  trades            Trade[]
+  tradingSummaries  TradingDailySummary[]
+  projects          Project[]
+  bookmarks         Bookmark[]
+  newsSources       NewsSource[]
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  type      String
+  createdAt DateTime @default(now())
+
+  posts       Post[]
+  socialPosts SocialPost[]
+  trades      Trade[]
+  projects    Project[]
+  bookmarks   Bookmark[]
+}
+
+model HealthDailyLog {
+  id              String    @id @default(cuid())
+  userId          String
+  date            DateTime
+  sleepStart      DateTime?
+  sleepEnd        DateTime?
+  sleepHours      Float?
+  exerciseMinutes Int?
+  exerciseType    String?
+  moodScore       Int?
+  energyScore     Int?
+  stressLevel     Int?
+  remark          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model Habit {
+  id                   String   @id @default(cuid())
+  userId               String
+  name                 String
+  description          String?
+  frequencyType        String
+  targetTimesPerPeriod Int
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checkins HabitCheckin[]
+
+  @@index([userId])
+}
+
+model HabitCheckin {
+  id        String   @id @default(cuid())
+  habitId   String
+  date      DateTime
+  done      Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([habitId, date])
+}
+
+model Post {
+  id              String   @id @default(cuid())
+  userId          String
+  title           String
+  contentMarkdown String?
+  category        String
+  status          String   @default("DRAFT")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  publishedAt     DateTime?
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags  Tag[]
+  links PostLink[]
+
+  @@index([userId, status])
+  @@index([category])
+}
+
+model PostLink {
+  id         String   @id @default(cuid())
+  postId     String
+  linkedType String
+  linkedId   String
+  createdAt  DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([linkedType, linkedId])
+}
+
+model NewsSource {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  type          String
+  url           String
+  fetchStrategy String
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items NewsItem[]
+
+  @@unique([userId, name])
+  @@index([userId, type])
+}
+
+model NewsItem {
+  id           String   @id @default(cuid())
+  sourceId     String
+  title        String
+  url          String
+  summary      String?
+  previewImage String?
+  siteName     String?
+  domain       String?
+  faviconUrl   String?
+  type         String   @default("article")
+  category     String?
+  publishedAt  DateTime
+  fetchedAt    DateTime @default(now())
+  isRead       Boolean  @default(false)
+  isFavorited  Boolean  @default(false)
+
+  source NewsSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId, publishedAt])
+  @@index([isRead, isFavorited])
+  @@index([type])
+}
+
+model SocialPost {
+  id                 String   @id @default(cuid())
+  userId             String
+  platform           String
+  title              String
+  contentText        String
+  status             String   @default("IDEA")
+  plannedPublishTime DateTime?
+  actualPublishTime  DateTime?
+  url                String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags  Tag[]
+  stats SocialPostStats[]
+
+  @@index([userId, status])
+  @@index([platform, status])
+}
+
+model SocialPostStats {
+  id           String   @id @default(cuid())
+  socialPostId String
+  snapshotTime DateTime @default(now())
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  comments     Int      @default(0)
+  shares       Int      @default(0)
+  collects     Int      @default(0)
+
+  socialPost SocialPost @relation(fields: [socialPostId], references: [id], onDelete: Cascade)
+
+  @@index([socialPostId, snapshotTime])
+}
+
+model Trade {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  market      String
+  symbol      String
+  direction   String
+  entryPrice  Float
+  exitPrice   Float
+  quantity    Float
+  pnl         Float
+  fees        Float
+  strategyTag String?
+  reasonOpen  String?
+  reasonClose String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags Tag[]
+
+  @@index([userId, date])
+  @@index([market, symbol])
+}
+
+model TradingDailySummary {
+  id              String   @id @default(cuid())
+  userId          String
+  date            DateTime
+  totalPnl        Float
+  mistakes        String?
+  whatWentWell    String?
+  planForTomorrow String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model Project {
+  id               String    @id @default(cuid())
+  userId           String
+  title            String
+  description      String?
+  longDescription  String?
+  status           String    @default("IDEA")
+  techStack        String?
+  githubUrl        String?
+  liveUrl          String?
+  imageUrl         String?
+  previewImage     String?
+  stars            Int?
+  language         String?
+  startDate        DateTime?
+  endDate          DateTime?
+  isPublic         Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags Tag[]
+
+  @@index([userId, status])
+  @@index([isPublic])
+}
+
+model Bookmark {
+  id            String    @id @default(cuid())
+  userId        String
+  title         String
+  url           String
+  description   String?
+  siteName      String?
+  domain        String?
+  faviconUrl    String?
+  imageUrl      String?
+  type          String    @default("other")
+  category      String
+  status        String    @default("TO_READ")
+  lastVisitedAt DateTime?
+  visitCount    Int       @default(0)
+  isFavorite    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags Tag[]
+
+  @@index([userId, category])
+  @@index([status, isFavorite])
+  @@index([userId, type])
+}
