@@ -56,9 +56,11 @@ model User {
   projects          Project[]
   bookmarks         Bookmark[]
   newsSources       NewsSource[]
-  trainingPlans     TrainingPlan[]
-  trainingSessions  TrainingSession[]
-  trainingReviews   TrainingWeeklyReview[]
+  trainingNotes     TrainingNote[]
+  trainingSnippets  TrainingSnippet[]
+  trainingResources TrainingResource[]
+  trainingBugs      TrainingBug[]
+  trainingProgress  TrainingProgress[]
 }
 
 model Tag {
@@ -136,10 +138,9 @@ model Post {
   updatedAt       DateTime @updatedAt
   publishedAt     DateTime?
 
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags             Tag[]
-  links            PostLink[]
-  trainingSessions TrainingSession[]
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags  Tag[]
+  links PostLink[]
 
   @@index([userId, status])
   @@index([category])
@@ -298,9 +299,9 @@ model Project {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags             Tag[]
-  trainingSessions TrainingSession[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags          Tag[]
+  trainingBugs  TrainingBug[]
 
   @@index([userId, status])
   @@index([isPublic])
@@ -333,93 +334,104 @@ model Bookmark {
   @@index([userId, type])
 }
 
-// Training System Models
-model TrainingPlan {
-  id          String              @id @default(cuid())
+// Training System Models - Knowledge Base
+model TrainingNote {
+  id          String          @id @default(cuid())
   userId      String
-  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   
+  domain      TrainingDomain
   title       String
-  description String?
-  domains     String              // JSON array of TrainingDomain
+  contentMd   String
+  tags        String          // JSON array
   
-  startDate   DateTime?
-  endDate     DateTime?
-  weeks       Int?
-  status      TrainingPlanStatus  @default(DRAFT)
+  isPinned    Boolean         @default(false)
   
-  targetHoursPerWeek Int?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  
-  sessions      TrainingSession[]
-  weeklyReviews TrainingWeeklyReview[]
-  
-  @@index([userId, status])
+  @@index([userId, domain])
+  @@index([isPinned])
 }
 
-model TrainingSession {
-  id          String              @id @default(cuid())
+model TrainingSnippet {
+  id          String          @id @default(cuid())
   userId      String
-  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  planId      String?
-  plan        TrainingPlan?       @relation(fields: [planId], references: [id], onDelete: SetNull)
-  
-  date        DateTime
+  domain      TrainingDomain
   title       String
-  type        TrainingSessionType
-  durationMin Int?
-  
-  domains     String              // JSON array of TrainingDomain
-  skillTags   String              // JSON array of strings
-  
   description String?
+  code        String
+  language    String
+  tags        String          // JSON array
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  @@index([userId, domain])
+  @@index([language])
+}
+
+model TrainingResource {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  domain      TrainingDomain
+  title       String
+  url         String
+  description String?
+  type        String          // article, video, course, tool, doc
+  tags        String          // JSON array
+  
+  isFavorite  Boolean         @default(false)
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  @@index([userId, domain])
+  @@index([type])
+  @@index([isFavorite])
+}
+
+model TrainingBug {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  domain      TrainingDomain
+  title       String
+  description String
+  solution    String?
+  tags        String          // JSON array
+  status      String          @default("OPEN") // OPEN, SOLVED
   
   projectId   String?
-  project     Project?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  project     Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
   
-  blogPostId  String?
-  blogPost    Post?               @relation(fields: [blogPostId], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  solvedAt    DateTime?
   
-  aiInvolved  Boolean             @default(false)
-  aiTools     String              // JSON array of strings
-  aiNotes     String?
-  
-  outcomeScore Int?
-  notesMd      String?
-  
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  
-  @@index([userId, date])
-  @@index([planId])
+  @@index([userId, domain])
+  @@index([status])
   @@index([projectId])
-  @@index([type])
 }
 
-model TrainingWeeklyReview {
-  id          String         @id @default(cuid())
+model TrainingProgress {
+  id          String          @id @default(cuid())
   userId      String
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  planId      String?
-  plan        TrainingPlan?  @relation(fields: [planId], references: [id], onDelete: SetNull)
+  domain      TrainingDomain
+  skill       String
+  level       Int             @default(1) // 1-5
+  notes       String?
   
-  weekIndex   Int
-  startDate   DateTime
-  endDate     DateTime
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   
-  summaryMd   String
-  lessonsMd   String
-  nextFocusMd String
-  
-  metricsJson Json?
-  
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  
-  @@unique([planId, weekIndex])
-  @@index([userId, startDate])
+  @@unique([userId, domain, skill])
+  @@index([userId, domain])
 }
