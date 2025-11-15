@@ -67,10 +67,10 @@ export function Sidebar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300',
+                'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-150',
                 isActive
                   ? 'glass-card theme-text-primary shadow-sm'
-                  : 'theme-text-secondary hover:glass-card hover:theme-text-primary hover:scale-105 active:scale-95'
+                  : 'theme-text-secondary hover:glass-card hover:theme-text-primary'
               )}
             >
               <item.icon className="h-5 w-5" />
@@ -104,7 +104,7 @@ export function Sidebar() {
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 md:hidden"
+            className="fixed inset-0 bg-black/30 z-40 md:hidden"
             onClick={() => setMobileOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 w-64 z-50 md:hidden flex flex-col glass-card m-4 rounded-[2rem]">

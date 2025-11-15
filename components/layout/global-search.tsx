@@ -111,7 +111,7 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-3 rounded-2xl glass-card px-5 py-3 text-sm theme-text-secondary transition-all hover:scale-105 active:scale-95 shadow-sm"
+        className="flex items-center gap-3 rounded-2xl glass-card px-5 py-3 text-sm theme-text-secondary transition-transform duration-150 hover:scale-[1.01] active:scale-[0.99] shadow-sm"
       >
         <Search className="h-4 w-4" />
         <span className="hidden text-sm sm:inline">搜索</span>

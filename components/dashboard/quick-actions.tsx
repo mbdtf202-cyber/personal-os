@@ -76,7 +76,7 @@ export function QuickActions() {
             {quickActions.map((action) => (
               <button
                 key={action.name}
-                className="flex flex-col items-center gap-3 p-5 rounded-2xl glass-card transition-all duration-300 hover:scale-105 active:scale-95"
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl glass-card transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
                 onClick={action.action}
               >
                 <div className="w-14 h-14 rounded-2xl theme-btn-primary flex items-center justify-center shadow-lg">

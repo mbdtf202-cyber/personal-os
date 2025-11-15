@@ -38,7 +38,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'rounded-[2rem] glass-card soft-shadow p-6 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
+        'rounded-[2rem] glass-card soft-shadow p-6 transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]',
         className
       )}
     >
