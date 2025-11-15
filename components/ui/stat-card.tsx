@@ -38,12 +38,9 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'rounded-2xl theme-bg-secondary border theme-border p-5 transition-all duration-200 active:scale-[0.98]',
+        'rounded-[2rem] glass-card soft-shadow p-6 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
         className
       )}
-      style={{
-        borderWidth: '1px',
-      }}
     >
       <div className="relative">
         <div className="flex items-start justify-between">

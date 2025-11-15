@@ -111,23 +111,26 @@ export function DashboardCards({ overview }: DashboardCardsProps) {
   ]
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <Link key={card.title} href={card.href}>
             <GlassCard hover>
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 rounded-full theme-btn-primary flex items-center justify-center">
-                    <card.icon className="h-5 w-5 text-white" />
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl theme-btn-primary flex items-center justify-center shadow-lg">
+                    <card.icon className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs font-medium theme-text-tertiary mb-1">
+                  <p className="text-xs font-semibold theme-text-tertiary mb-2 uppercase tracking-wide">
                     {card.title}
                   </p>
-                  <p className="text-2xl font-semibold theme-text-primary">
+                  <p className="text-3xl font-bold theme-text-primary">
                     {card.value}
+                  </p>
+                  <p className="text-sm theme-text-secondary mt-2">
+                    {card.description}
                   </p>
                 </div>
               </div>

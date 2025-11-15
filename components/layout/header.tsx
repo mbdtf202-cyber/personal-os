@@ -25,7 +25,7 @@ export function Header() {
   }
 
   return (
-    <header className="flex items-center justify-between rounded-2xl theme-bg-secondary px-4 py-3 border theme-border" style={{ borderWidth: '1px' }}>
+    <header className="flex items-center justify-between rounded-3xl glass-card soft-shadow px-6 py-4">
       <div className="flex flex-1 items-center gap-4">
         <GlobalSearch />
       </div>

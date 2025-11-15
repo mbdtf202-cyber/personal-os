@@ -17,9 +17,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl theme-bg-secondary p-6 border theme-border" style={{ borderWidth: '1px' }}>
-        <h1 className="text-3xl font-semibold mb-1 theme-text-primary">{greeting}</h1>
-        <p className="text-sm theme-text-tertiary">
+      <div className="rounded-[2rem] glass-card soft-shadow p-8">
+        <h1 className="text-4xl font-bold mb-2 theme-text-primary tracking-tight">{greeting}</h1>
+        <p className="text-base theme-text-secondary">
           {new Date().toLocaleDateString('zh-CN', { 
             year: 'numeric', 
             month: 'long', 

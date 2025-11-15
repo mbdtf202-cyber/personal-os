@@ -68,21 +68,21 @@ export function QuickActions() {
   return (
     <>
       <GlassCard>
-        <div className="p-5">
-          <h3 className="text-base font-semibold theme-text-primary mb-3">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold theme-text-primary mb-4">
             快速操作
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {quickActions.map((action) => (
               <button
                 key={action.name}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl theme-bg-tertiary theme-text-primary transition-all duration-200 active:scale-95 hover:theme-bg-primary"
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl glass-card transition-all duration-300 hover:scale-105 active:scale-95"
                 onClick={action.action}
               >
-                <div className="w-12 h-12 rounded-full theme-btn-primary flex items-center justify-center">
-                  <action.icon className="h-5 w-5 text-white" />
+                <div className="w-14 h-14 rounded-2xl theme-btn-primary flex items-center justify-center shadow-lg">
+                  <action.icon className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xs font-medium">{action.name}</span>
+                <span className="text-sm font-medium theme-text-primary">{action.name}</span>
               </button>
             ))}
           </div>

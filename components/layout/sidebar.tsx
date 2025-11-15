@@ -39,12 +39,12 @@ export function Sidebar() {
 
   const SidebarContent = () => (
     <>
-      <div className="flex h-14 items-center gap-3 px-4 theme-border" style={{ borderBottomWidth: '1px' }}>
-        <div className="w-8 h-8 rounded-lg theme-btn-primary flex items-center justify-center">
-          <Sparkles className="h-4 w-4 text-white" />
+      <div className="flex h-16 items-center gap-3 px-5 mb-2">
+        <div className="w-10 h-10 rounded-2xl theme-btn-primary flex items-center justify-center shadow-lg">
+          <Sparkles className="h-5 w-5 text-white" />
         </div>
         <div className="flex-1">
-          <h1 className="text-base font-semibold theme-text-primary">
+          <h1 className="text-lg font-bold theme-text-primary">
             Personal OS
           </h1>
         </div>
@@ -58,7 +58,7 @@ export function Sidebar() {
         </Button>
       </div>
 
-      <nav className="flex-1 space-y-0.5 px-2 py-4 overflow-y-auto">
+      <nav className="flex-1 space-y-1 px-3 py-2 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
@@ -67,10 +67,10 @@ export function Sidebar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
+                'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300',
                 isActive
-                  ? 'theme-bg-tertiary theme-text-primary'
-                  : 'theme-text-secondary hover:theme-bg-tertiary hover:theme-text-primary active:scale-95'
+                  ? 'glass-card theme-text-primary shadow-sm'
+                  : 'theme-text-secondary hover:glass-card hover:theme-text-primary hover:scale-105 active:scale-95'
               )}
             >
               <item.icon className="h-5 w-5" />
@@ -96,7 +96,7 @@ export function Sidebar() {
       </Button>
 
       {/* Desktop sidebar */}
-      <div className="hidden md:flex relative h-full w-64 flex-col overflow-hidden theme-bg-secondary theme-border" style={{ borderRightWidth: '1px' }}>
+      <div className="hidden md:flex relative h-full w-64 flex-col overflow-hidden glass-card m-4 rounded-[2rem]">
         <SidebarContent />
       </div>
 
@@ -104,10 +104,10 @@ export function Sidebar() {
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 md:hidden"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 w-64 z-50 md:hidden flex flex-col theme-bg-secondary theme-border" style={{ borderRightWidth: '1px' }}>
+          <div className="fixed inset-y-0 left-0 w-64 z-50 md:hidden flex flex-col glass-card m-4 rounded-[2rem]">
             <SidebarContent />
           </div>
         </>
