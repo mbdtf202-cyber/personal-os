@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server'
 import { socialService } from '@/lib/services/social'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 import { socialPostSchema } from '@/lib/validations/social'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export async function PATCH(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
-    const userId = await requireAuth()
-    const { id } = await context.params
+    const userId = await requireApiAuth()
+    const { id } = context.params
     const body = await request.json()
     const validated = socialPostSchema.partial().parse(body)
     
@@ -25,7 +26,13 @@ export async function PATCH(
       )
     }
     
-    console.error('Failed to update social post:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to update social post', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

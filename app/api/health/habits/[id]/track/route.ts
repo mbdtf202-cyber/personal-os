@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server'
 import { healthService } from '@/lib/services/health'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 
 export async function POST(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
-    await requireAuth()
-    const { id } = await context.params
+    await requireApiAuth()
+    const { id } = context.params
     const body = await request.json()
     const { date } = body
     
@@ -16,7 +17,13 @@ export async function POST(
     
     return NextResponse.json(tracking, { status: 201 })
   } catch (error) {
-    console.error('Failed to track habit:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to track habit', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

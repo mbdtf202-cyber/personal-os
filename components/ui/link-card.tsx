@@ -1,3 +1,7 @@
+"use client"
+
+import { useState } from 'react'
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -20,6 +24,7 @@ interface LinkCardProps {
   onToggleFavorite?: () => void
   onClick?: () => void
   className?: string
+  isUpdating?: boolean
 }
 
 export function LinkCard({
@@ -38,7 +43,11 @@ export function LinkCard({
   onToggleFavorite,
   onClick,
   className,
+  isUpdating = false,
 }: LinkCardProps) {
+  const [previewError, setPreviewError] = useState(false)
+  const [faviconError, setFaviconError] = useState(false)
+
   const getTypeIcon = () => {
     switch (type) {
       case 'video':
@@ -67,42 +76,43 @@ export function LinkCard({
       <CardContent className="p-4">
         <div className="flex gap-4">
           {/* Preview Image or Placeholder */}
-          {imageUrl ? (
-            <div className="flex-shrink-0">
-              <img
+          {imageUrl && !previewError ? (
+            <div className="relative h-28 w-40 overflow-hidden rounded">
+              <Image
                 src={imageUrl}
                 alt={title}
-                className="w-40 h-28 object-cover rounded"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                }}
+                fill
+                className="object-cover"
+                sizes="160px"
+                onError={() => setPreviewError(true)}
               />
             </div>
-          ) : faviconUrl ? (
+          ) : faviconUrl && !faviconError ? (
             <div className="flex-shrink-0 w-40 h-28 bg-secondary rounded flex items-center justify-center">
-              <img
+              <Image
                 src={faviconUrl}
                 alt=""
-                className="w-12 h-12 opacity-50"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                }}
+                width={48}
+                height={48}
+                className="opacity-50"
+                onError={() => setFaviconError(true)}
               />
             </div>
-          ) : null}
+          ) : (
+            <div className="flex-shrink-0 w-40 h-28 rounded bg-secondary/60" />
+          )}
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Header: Favicon + Site Name + Type Badge */}
             <div className="flex items-center gap-2 mb-2">
-              {faviconUrl && (
-                <img
+              {faviconUrl && !faviconError && (
+                <Image
                   src={faviconUrl}
                   alt=""
-                  className="w-4 h-4"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                  }}
+                  width={16}
+                  height={16}
+                  onError={() => setFaviconError(true)}
                 />
               )}
               <span className="text-xs text-muted-foreground">
@@ -162,6 +172,7 @@ export function LinkCard({
                   variant="ghost"
                   onClick={onToggleRead}
                   className="h-7 px-2"
+                  disabled={isUpdating}
                 >
                   <Check
                     className={cn(
@@ -177,6 +188,7 @@ export function LinkCard({
                   variant="ghost"
                   onClick={onToggleFavorite}
                   className="h-7 px-2"
+                  disabled={isUpdating}
                 >
                   <Star
                     className={cn(

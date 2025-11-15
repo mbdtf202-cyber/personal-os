@@ -1,58 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { AddNewsLinkDialog } from '@/components/news/add-news-link-dialog'
 import { NewsCard } from '@/components/news/news-card'
-import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { toast } from 'sonner'
-
-interface NewsItem {
-  id: string
-  title: string
-  url: string
-  summary: string | null
-  previewImage: string | null
-  siteName: string | null
-  domain: string | null
-  faviconUrl: string | null
-  type: string
-  publishedAt: string
-  isRead: boolean
-  isFavorited: boolean
-  source: {
-    name: string
-    type: string
-  }
-}
+import { Button } from '@/components/ui/button'
+import { useNewsItems } from '@/hooks/useNewsItems'
 
 export default function NewsPage() {
-  const [items, setItems] = useState<NewsItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'unread' | 'favorites'>('all')
-
-  async function loadItems() {
-    try {
-      const params = new URLSearchParams()
-      if (filter === 'unread') params.set('isRead', 'false')
-      if (filter === 'favorites') params.set('isFavorited', 'true')
-
-      const response = await fetch(`/api/news/items?${params}`)
-      if (!response.ok) throw new Error('Failed to load items')
-
-      const data = await response.json()
-      setItems(data.items)
-    } catch (error) {
-      console.error('Failed to load news items:', error)
-      toast.error('Failed to load news items')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadItems()
-  }, [filter])
+  const { items, isPending, isError, refetch, queryKey, error } = useNewsItems(filter)
 
   return (
     <div className="space-y-6">
@@ -63,10 +20,10 @@ export default function NewsPage() {
             Your curated news feed
           </p>
         </div>
-        <AddNewsLinkDialog onSuccess={loadItems} />
+        <AddNewsLinkDialog onSuccess={() => refetch()} />
       </div>
 
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread' | 'favorites')}>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="unread">Unread</TabsTrigger>
@@ -74,9 +31,23 @@ export default function NewsPage() {
         </TabsList>
       </Tabs>
 
-      {isLoading ? (
+      {isPending ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">Loading...</p>
+        </div>
+      ) : isError ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-2">Unable to load news items.</p>
+          <Button
+            variant="link"
+            className="h-auto p-0 text-sm"
+            onClick={() => refetch()}
+          >
+            Try again
+          </Button>
+          {error instanceof Error && (
+            <p className="mt-2 text-xs text-muted-foreground">{error.message}</p>
+          )}
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-12">
@@ -87,7 +58,7 @@ export default function NewsPage() {
       ) : (
         <div className="space-y-4">
           {items.map((item) => (
-            <NewsCard key={item.id} item={item} onUpdate={loadItems} />
+            <NewsCard key={item.id} item={item} queryKey={queryKey} />
           ))}
         </div>
       )}

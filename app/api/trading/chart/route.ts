@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { tradingService } from '@/lib/services/trading'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '30')
     
@@ -12,7 +13,13 @@ export async function GET(request: Request) {
     
     return NextResponse.json(stats)
   } catch (error) {
-    console.error('Failed to get trading stats:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get trading stats', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { blogService } from '@/lib/services/blog'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 import { createPostSchema } from '@/lib/validations/blog'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const { searchParams } = new URL(request.url)
     
     const filters = {
@@ -18,7 +19,13 @@ export async function GET(request: Request) {
     
     return NextResponse.json({ posts, total: posts.length })
   } catch (error) {
-    console.error('Failed to get blog posts:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get blog posts', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -28,7 +35,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const body = await request.json()
     
     // Step 1: Create post with title and metadata only
@@ -49,7 +56,13 @@ export async function POST(request: Request) {
       )
     }
     
-    console.error('Failed to create blog post:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to create blog post', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

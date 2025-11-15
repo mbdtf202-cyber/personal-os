@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server'
 import { blogService } from '@/lib/services/blog'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 import { updatePostSchema } from '@/lib/validations/blog'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export async function GET(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
-    const userId = await requireAuth()
-    const { id } = await context.params
+    const userId = await requireApiAuth()
+    const { id } = context.params
     const post = await blogService.getPostById(id, userId)
     
     if (!post) {
@@ -19,10 +20,16 @@ export async function GET(
         { status: 404 }
       )
     }
-    
+
     return NextResponse.json(post)
   } catch (error) {
-    console.error('Failed to get blog post:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get blog post', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -32,11 +39,11 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
-    const userId = await requireAuth()
-    const { id } = await context.params
+    const userId = await requireApiAuth()
+    const { id } = context.params
     const body = await request.json()
     const validated = updatePostSchema.parse(body)
     
@@ -51,7 +58,13 @@ export async function PUT(
       )
     }
     
-    console.error('Failed to update blog post:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to update blog post', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -61,17 +74,23 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
-    const userId = await requireAuth()
-    const { id } = await context.params
+    const userId = await requireApiAuth()
+    const { id } = context.params
     
     await blogService.deletePost(id, userId)
     
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Failed to delete blog post:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to delete blog post', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

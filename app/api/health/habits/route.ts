@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server'
 import { healthService } from '@/lib/services/health'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 import { habitSchema } from '@/lib/validations/health'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const habits = await healthService.getHabits(userId)
     
     return NextResponse.json({ habits, total: habits.length })
   } catch (error) {
-    console.error('Failed to get habits:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get habits', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -21,7 +28,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const body = await request.json()
     const validated = habitSchema.parse(body)
     
@@ -36,7 +43,13 @@ export async function POST(request: Request) {
       )
     }
     
-    console.error('Failed to create habit:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to create habit', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

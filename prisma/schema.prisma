@@ -38,14 +38,14 @@ enum TrainingPlanStatus {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   name      String
-  password  String
+  passwordHash String
   avatar    String?
-  timezone  String   @default("Asia/Shanghai")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  timezone  String    @default("Asia/Shanghai")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   healthLogs        HealthDailyLog[]
   habits            Habit[]
@@ -61,6 +61,20 @@ model User {
   trainingResources TrainingResource[]
   trainingBugs      TrainingBug[]
   trainingProgress  TrainingProgress[]
+  sessions          Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Tag {

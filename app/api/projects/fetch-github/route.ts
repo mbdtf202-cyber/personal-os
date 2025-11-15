@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { linkPreviewService } from '@/lib/services/link-preview';
+import { logger } from '@/lib/logger';
 
 const fetchGitHubSchema = z.object({
   url: z.string().url('Invalid URL format'),
@@ -30,10 +31,13 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error('Failed to fetch GitHub repo:', error);
+    logger.error('Failed to fetch GitHub repo details', {
+      error: error instanceof Error ? error.message : String(error),
+      requestUrl: request.url,
+    });
     return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : 'Failed to fetch GitHub repository' 
+      {
+        error: error instanceof Error ? error.message : 'Failed to fetch GitHub repository'
       },
       { status: 500 }
     );
