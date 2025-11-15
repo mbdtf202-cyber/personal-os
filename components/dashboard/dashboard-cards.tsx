@@ -1,17 +1,18 @@
+import { DashboardCard } from '@/components/dashboard/dashboard-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
-  Heart, 
-  FileText, 
-  Newspaper, 
-  Share2, 
-  TrendingUp, 
-  FolderKanban, 
+import {
+  Heart,
+  FileText,
+  Newspaper,
+  Share2,
+  TrendingUp,
+  FolderKanban,
   Bookmark,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react'
 
 interface DashboardCardsProps {
@@ -28,7 +29,12 @@ interface DashboardCardsProps {
     }
     social: {
       scheduledToday: number
-      posts: any[]
+      posts: Array<{
+        id: string
+        title: string
+        platform: string
+        plannedPublishTime: string | Date
+      }>
     }
     trading: {
       tradesCount: number
@@ -45,172 +51,113 @@ interface DashboardCardsProps {
 export function DashboardCards({ overview }: DashboardCardsProps) {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Health</CardTitle>
-            <Heart className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                {overview.health.hasLog ? (
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle className="h-4 w-4" />
-                    <span className="text-sm">Logged today</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-orange-600">
-                    <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm">Not logged yet</span>
-                  </div>
-                )}
-                {overview.health.pendingHabits > 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    {overview.health.pendingHabits} habits pending
-                  </p>
-                )}
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <DashboardCard
+          title="Health"
+          icon={Heart}
+          description="Daily wellbeing snapshot"
+          action={{ label: 'Open health hub', href: '/health' }}
+        >
+          <div className="space-y-3">
+            {overview.health.hasLog ? (
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-200">
+                <CheckCircle className="h-4 w-4" />
+                Logged today
               </div>
-              <Link href="/health">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+            ) : (
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-600 dark:bg-amber-500/20 dark:text-amber-200">
+                <AlertCircle className="h-4 w-4" />
+                Not logged yet
+              </div>
+            )}
+            {overview.health.pendingHabits > 0 && (
+              <p className="text-sm text-slate-500 dark:text-slate-300">
+                {overview.health.pendingHabits} habit{overview.health.pendingHabits === 1 ? '' : 's'} waiting for attention.
+              </p>
+            )}
+          </div>
+        </DashboardCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Blog</CardTitle>
-            <FileText className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">{overview.blog.draftCount}</div>
-                <p className="text-xs text-gray-500">Drafts</p>
-              </div>
-              <Link href="/blog">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <DashboardCard
+          title="Blog"
+          icon={FileText}
+          description="Ideas ready to publish"
+          value={overview.blog.draftCount}
+          action={{ label: 'Go to blog', href: '/blog' }}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">News</CardTitle>
-            <Newspaper className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">{overview.news.unreadCount}</div>
-                <p className="text-xs text-gray-500">Unread</p>
-              </div>
-              <Link href="/news">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <DashboardCard
+          title="News"
+          icon={Newspaper}
+          description="Unread curated stories"
+          value={overview.news.unreadCount}
+          action={{ label: 'Browse news', href: '/news' }}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Social</CardTitle>
-            <Share2 className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">{overview.social.scheduledToday}</div>
-                <p className="text-xs text-gray-500">Scheduled today</p>
-              </div>
-              <Link href="/social">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <DashboardCard
+          title="Social"
+          icon={Share2}
+          description="Scheduled posts today"
+          value={overview.social.scheduledToday}
+          action={{ label: 'Open social desk', href: '/social' }}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Trading</CardTitle>
-            <TrendingUp className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">{overview.trading.tradesCount}</div>
-                <p className="text-xs text-gray-500">Trades today</p>
-              </div>
-              <Link href="/trading">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <DashboardCard
+          title="Trading"
+          icon={TrendingUp}
+          description="Trades recorded today"
+          value={overview.trading.tradesCount}
+          action={{ label: 'Review trades', href: '/trading' }}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Projects</CardTitle>
-            <FolderKanban className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">{overview.projects.activeCount}</div>
-                <p className="text-xs text-gray-500">Active</p>
-              </div>
-              <Link href="/projects">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <DashboardCard
+          title="Projects"
+          icon={FolderKanban}
+          description="Active focus streams"
+          value={overview.projects.activeCount}
+          action={{ label: 'View projects', href: '/projects' }}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Bookmarks</CardTitle>
-            <Bookmark className="h-4 w-4 text-gray-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">{overview.bookmarks.toReadCount}</div>
-                <p className="text-xs text-gray-500">To read</p>
-              </div>
-              <Link href="/bookmarks">
-                <Button variant="ghost" size="sm">View</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <DashboardCard
+          title="Bookmarks"
+          icon={Bookmark}
+          description="Articles saved to read"
+          value={overview.bookmarks.toReadCount}
+          action={{ label: 'Open bookmarks', href: '/bookmarks' }}
+        />
       </div>
 
       {overview.social.scheduledToday > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Scheduled Posts Today</CardTitle>
+            <CardTitle className="text-lg font-semibold text-slate-600 dark:text-white">
+              Scheduled Posts Today
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {overview.social.posts.map((post: any) => (
-                <div key={post.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{post.title}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline">{post.platform}</Badge>
-                      <span className="text-xs text-gray-500">
-                        {new Date(post.plannedPublishTime).toLocaleTimeString()}
-                      </span>
-                    </div>
+          <CardContent className="space-y-3">
+            {overview.social.posts.map((post) => (
+              <div
+                key={post.id}
+                className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_18px_40px_rgba(79,70,229,0.18)] dark:border-white/10 dark:bg-white/5"
+              >
+                <div>
+                  <p className="font-medium text-slate-700 dark:text-white">{post.title}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full border-white/60 px-2 text-xs text-slate-500 dark:border-white/10 dark:text-slate-200">
+                      {post.platform}
+                    </Badge>
+                    <span className="text-xs text-slate-400 dark:text-slate-300">
+                      {new Date(post.plannedPublishTime).toLocaleTimeString()}
+                    </span>
                   </div>
-                  <Link href="/social">
-                    <Button variant="ghost" size="sm">View</Button>
-                  </Link>
                 </div>
-              ))}
-            </div>
+                <Link href="/social">
+                  <Button variant="outline" size="sm">
+                    View
+                  </Button>
+                </Link>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}
