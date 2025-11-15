@@ -2,6 +2,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { GlassCard } from '@/components/ui/glass-card'
 import { Button } from '@/components/ui/button'
 import { QuickLogDialog } from '@/components/health/quick-log-dialog'
@@ -19,6 +20,7 @@ import {
 import { cn } from '@/lib/utils'
 
 export function QuickActions() {
+  const router = useRouter()
   const [healthDialogOpen, setHealthDialogOpen] = useState(false)
   const [bookmarkDialogOpen, setBookmarkDialogOpen] = useState(false)
   const [projectDialogOpen, setProjectDialogOpen] = useState(false)
@@ -34,7 +36,7 @@ export function QuickActions() {
     {
       name: '写博客',
       icon: FileText,
-      action: () => window.location.href = '/blog/new',
+      action: () => router.push('/blog/new'),
       color: 'from-emerald-600 to-teal-700',
     },
     {
@@ -58,7 +60,7 @@ export function QuickActions() {
     {
       name: '学习笔记',
       icon: GraduationCap,
-      action: () => window.location.href = '/training',
+      action: () => router.push('/training'),
       color: 'from-amber-600 to-orange-700',
     },
   ]
@@ -99,25 +101,37 @@ export function QuickActions() {
       <QuickLogDialog
         open={healthDialogOpen}
         onOpenChange={setHealthDialogOpen}
-        onSuccess={() => window.location.reload()}
+        onSuccess={() => {
+          setHealthDialogOpen(false)
+          router.refresh()
+        }}
       />
 
       <QuickAddBookmarkDialog
         open={bookmarkDialogOpen}
         onOpenChange={setBookmarkDialogOpen}
-        onSuccess={() => window.location.reload()}
+        onSuccess={() => {
+          setBookmarkDialogOpen(false)
+          router.refresh()
+        }}
       />
 
       <QuickCreateProjectDialog
         open={projectDialogOpen}
         onOpenChange={setProjectDialogOpen}
-        onSuccess={() => window.location.reload()}
+        onSuccess={() => {
+          setProjectDialogOpen(false)
+          router.refresh()
+        }}
       />
 
       <QuickTradeDialog
         open={tradeDialogOpen}
         onOpenChange={setTradeDialogOpen}
-        onSuccess={() => window.location.reload()}
+        onSuccess={() => {
+          setTradeDialogOpen(false)
+          router.refresh()
+        }}
       />
     </>
   )

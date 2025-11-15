@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AppProviders } from "@/components/providers/app-providers";
+import { ThemeScript } from "./theme-script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <ThemeScript />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

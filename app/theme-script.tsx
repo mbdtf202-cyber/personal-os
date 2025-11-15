@@ -1,0 +1,125 @@
+export function ThemeScript() {
+  const themeScript = `
+    (function() {
+      try {
+        const theme = localStorage.getItem('app-theme') || 'minimal-light';
+        const themes = {
+          'minimal-light': {
+            '--bg-primary': '#FAFAFA',
+            '--bg-secondary': '#FFFFFF',
+            '--bg-tertiary': '#F5F5F5',
+            '--text-primary': '#1A1A1A',
+            '--text-secondary': '#666666',
+            '--text-tertiary': '#999999',
+            '--border-color': '#E8E8E8',
+            '--border-light': '#F0F0F0',
+            '--color-primary': '#007AFF',
+            '--color-success': '#34C759',
+            '--color-warning': '#FF9500',
+            '--color-danger': '#FF3B30',
+            '--shadow-sm': '0 1px 2px rgba(0, 0, 0, 0.05)',
+            '--shadow-md': '0 4px 12px rgba(0, 0, 0, 0.08)',
+            '--shadow-lg': '0 12px 24px rgba(0, 0, 0, 0.12)',
+          },
+          'soft-blue': {
+            '--bg-primary': '#F8FAFC',
+            '--bg-secondary': '#FFFFFF',
+            '--bg-tertiary': '#F1F5F9',
+            '--text-primary': '#0F172A',
+            '--text-secondary': '#475569',
+            '--text-tertiary': '#94A3B8',
+            '--border-color': '#E2E8F0',
+            '--border-light': '#F1F5F9',
+            '--color-primary': '#0EA5E9',
+            '--color-success': '#10B981',
+            '--color-warning': '#F59E0B',
+            '--color-danger': '#EF4444',
+            '--shadow-sm': '0 1px 3px rgba(15, 23, 42, 0.08)',
+            '--shadow-md': '0 4px 16px rgba(15, 23, 42, 0.12)',
+            '--shadow-lg': '0 16px 32px rgba(15, 23, 42, 0.16)',
+          },
+          'fresh-green': {
+            '--bg-primary': '#F0FDF4',
+            '--bg-secondary': '#FFFFFF',
+            '--bg-tertiary': '#F7FEF5',
+            '--text-primary': '#0B5E0B',
+            '--text-secondary': '#4B7C4B',
+            '--text-tertiary': '#9CA89C',
+            '--border-color': '#D1E7D1',
+            '--border-light': '#E8F5E8',
+            '--color-primary': '#16A34A',
+            '--color-success': '#22C55E',
+            '--color-warning': '#FBBF24',
+            '--color-danger': '#F87171',
+            '--shadow-sm': '0 1px 2px rgba(11, 94, 11, 0.05)',
+            '--shadow-md': '0 4px 12px rgba(11, 94, 11, 0.08)',
+            '--shadow-lg': '0 12px 24px rgba(11, 94, 11, 0.12)',
+          },
+          'elegant-purple': {
+            '--bg-primary': '#FAF8FC',
+            '--bg-secondary': '#FFFFFF',
+            '--bg-tertiary': '#F5F3F9',
+            '--text-primary': '#3F1F5C',
+            '--text-secondary': '#6B5B7F',
+            '--text-tertiary': '#9B8FB3',
+            '--border-color': '#E9DFF5',
+            '--border-light': '#F3EEF9',
+            '--color-primary': '#A855F7',
+            '--color-success': '#8B5CF6',
+            '--color-warning': '#EC4899',
+            '--color-danger': '#D946EF',
+            '--shadow-sm': '0 1px 3px rgba(63, 31, 92, 0.08)',
+            '--shadow-md': '0 4px 16px rgba(63, 31, 92, 0.12)',
+            '--shadow-lg': '0 16px 32px rgba(63, 31, 92, 0.16)',
+          },
+          'warm-beige': {
+            '--bg-primary': '#FFFBF7',
+            '--bg-secondary': '#FFFFFF',
+            '--bg-tertiary': '#FEF9F5',
+            '--text-primary': '#5C4033',
+            '--text-secondary': '#8B7355',
+            '--text-tertiary': '#B8A89F',
+            '--border-color': '#F0E6DC',
+            '--border-light': '#F8F2ED',
+            '--color-primary': '#D97706',
+            '--color-success': '#B45309',
+            '--color-warning': '#EA580C',
+            '--color-danger': '#DC2626',
+            '--shadow-sm': '0 1px 2px rgba(92, 64, 51, 0.05)',
+            '--shadow-md': '0 4px 12px rgba(92, 64, 51, 0.08)',
+            '--shadow-lg': '0 12px 24px rgba(92, 64, 51, 0.12)',
+          },
+          'deep-dark': {
+            '--bg-primary': '#0F172A',
+            '--bg-secondary': '#1E293B',
+            '--bg-tertiary': '#334155',
+            '--text-primary': '#F1F5F9',
+            '--text-secondary': '#CBD5E1',
+            '--text-tertiary': '#94A3B8',
+            '--border-color': '#475569',
+            '--border-light': '#334155',
+            '--color-primary': '#38BDF8',
+            '--color-success': '#4ADE80',
+            '--color-warning': '#FACC15',
+            '--color-danger': '#F87171',
+            '--shadow-sm': '0 1px 3px rgba(0, 0, 0, 0.3)',
+            '--shadow-md': '0 4px 16px rgba(0, 0, 0, 0.4)',
+            '--shadow-lg': '0 16px 32px rgba(0, 0, 0, 0.5)',
+          },
+        };
+        const root = document.documentElement;
+        const themeVars = themes[theme] || themes['minimal-light'];
+        Object.entries(themeVars).forEach(([key, value]) => {
+          root.style.setProperty(key, value);
+        });
+      } catch (e) {}
+    })();
+  `;
+
+  return (
+    <script
+      dangerouslySetInnerHTML={{ __html: themeScript }}
+      suppressHydrationWarning
+    />
+  );
+}

@@ -28,13 +28,16 @@ export function QuickLogDialog({ open, onOpenChange, onSuccess }: QuickLogDialog
     setLoading(true)
 
     try {
+      const sleepValue = formData.sleepHours ? parseFloat(formData.sleepHours) : null
+      const exerciseValue = formData.exerciseMinutes ? parseInt(formData.exerciseMinutes) : null
+      
       const response = await fetch('/api/health/logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           date: new Date().toISOString(),
-          sleepHours: parseFloat(formData.sleepHours) || null,
-          exerciseMinutes: parseInt(formData.exerciseMinutes) || null,
+          sleepHours: sleepValue !== null && !Number.isNaN(sleepValue) ? sleepValue : null,
+          exerciseMinutes: exerciseValue !== null && !Number.isNaN(exerciseValue) ? exerciseValue : null,
           moodScore: parseInt(formData.moodScore),
           energyScore: parseInt(formData.energyScore),
           stressLevel: parseInt(formData.stressLevel),
