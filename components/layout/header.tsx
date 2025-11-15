@@ -56,7 +56,7 @@ export function Header({ user }: HeaderProps) {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
+    <header className="flex items-center justify-between rounded-[2rem] border border-white/50 bg-white/70 px-6 py-4 shadow-[0_20px_60px_rgba(15,23,42,0.1)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/60">
       <div className="flex flex-1 items-center gap-4">
         <GlobalSearch />
       </div>
@@ -66,28 +66,30 @@ export function Header({ user }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="relative h-10 w-10 rounded-full"
+              className="relative h-12 w-12 rounded-full border border-white/70 bg-white/80 shadow-[0_10px_30px_rgba(79,70,229,0.2)] transition-all hover:scale-[1.02] hover:shadow-[0_18px_40px_rgba(79,70,229,0.25)] dark:border-white/10 dark:bg-slate-900/60"
               disabled={isSigningOut}
             >
-              <Avatar>
-                <AvatarFallback>{initials}</AvatarFallback>
+              <Avatar className="h-10 w-10">
+                <AvatarFallback className="bg-gradient-to-br from-sky-400 to-indigo-500 text-white">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-64 rounded-3xl border-white/60 bg-white/80 p-4 shadow-[0_30px_60px_rgba(15,23,42,0.12)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/80">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">{user?.name ?? 'Unknown user'}</p>
-                <p className="text-xs text-gray-500">{user?.email ?? 'Not signed in'}</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-white">{user?.name ?? 'Unknown user'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-300">{user?.email ?? 'Not signed in'}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuItem className="gap-2">
+            <DropdownMenuItem className="gap-2 rounded-2xl px-3 py-2 text-slate-600 transition hover:bg-white/80 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-white/10">
               <User className="h-4 w-4" />
               Profile
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleSignOut}
-              className="gap-2 text-red-600 focus:text-red-600"
+              className="gap-2 rounded-2xl px-3 py-2 text-rose-500 transition hover:bg-rose-50/80 hover:text-rose-600 focus:text-rose-600 dark:text-rose-400 dark:hover:bg-rose-500/20"
             >
               <LogOut className="h-4 w-4" />
               Sign out
