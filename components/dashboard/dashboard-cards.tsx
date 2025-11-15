@@ -111,31 +111,24 @@ export function DashboardCards({ overview }: DashboardCardsProps) {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <Link key={card.title} href={card.href}>
-            <GlassCard hover glow>
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium theme-text-secondary">
-                      {card.title}
-                    </p>
-                    <p className="mt-2 text-3xl font-bold tracking-tight theme-text-primary">
-                      {card.value}
-                    </p>
-                    <p className="mt-2 text-xs theme-text-tertiary">
-                      {card.description}
-                    </p>
-                  </div>
-                  <div className="rounded-xl theme-bg-tertiary p-3">
-                    <card.icon className="h-6 w-6 theme-text-secondary" />
+            <GlassCard hover>
+              <div className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-10 h-10 rounded-full theme-btn-primary flex items-center justify-center">
+                    <card.icon className="h-5 w-5 text-white" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm font-medium theme-color-primary">
-                  查看详情
-                  <ArrowRight className="ml-1 h-4 w-4" />
+                <div>
+                  <p className="text-xs font-medium theme-text-tertiary mb-1">
+                    {card.title}
+                  </p>
+                  <p className="text-2xl font-semibold theme-text-primary">
+                    {card.value}
+                  </p>
                 </div>
               </div>
             </GlassCard>

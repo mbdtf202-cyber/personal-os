@@ -38,20 +38,13 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-2xl',
-        'theme-bg-secondary',
-        'theme-border',
-        'p-6 transition-all duration-300',
-        'hover:shadow-lg hover:shadow-black/5 hover:-translate-y-0.5',
+        'rounded-2xl theme-bg-secondary border theme-border p-5 transition-all duration-200 active:scale-[0.98]',
         className
       )}
       style={{
         borderWidth: '1px',
       }}
     >
-      {/* 背景装饰 */}
-      <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br from-blue-500/5 to-purple-500/5 blur-2xl transition-all duration-300 group-hover:scale-150" />
-      
       <div className="relative">
         <div className="flex items-start justify-between">
           <div className="flex-1">

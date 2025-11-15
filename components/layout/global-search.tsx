@@ -111,12 +111,11 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="group flex items-center gap-2 rounded-full theme-border theme-bg-tertiary px-5 py-2.5 text-sm font-medium theme-text-secondary theme-shadow-md transition-all hover:scale-[1.01] hover:theme-text-primary focus:outline-none focus:ring-2 focus:ring-sky-200 backdrop-blur-xl"
-        style={{ borderWidth: '1px' }}
+        className="flex items-center gap-2 rounded-xl theme-bg-tertiary px-4 py-2 text-sm theme-text-tertiary transition-all hover:theme-text-primary active:scale-95"
       >
-        <Search className="h-4 w-4 theme-color-primary transition-colors" />
-        <span className="hidden text-sm sm:inline">Search the workspace</span>
-        <kbd className="hidden items-center gap-1 rounded-full theme-border theme-bg-secondary px-2 py-0.5 font-mono text-[10px] theme-text-tertiary shadow-sm sm:flex" style={{ borderWidth: '1px' }}>
+        <Search className="h-4 w-4" />
+        <span className="hidden text-sm sm:inline">搜索</span>
+        <kbd className="hidden items-center gap-1 rounded-md theme-bg-secondary px-1.5 py-0.5 font-mono text-[10px] theme-text-tertiary sm:flex">
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>

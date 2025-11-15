@@ -17,39 +17,18 @@ export function GlassCard({
   glow = false,
   gradient = 'none',
 }: GlassCardProps) {
-  const gradients = {
-    purple: 'from-purple-500/10 via-transparent to-transparent',
-    blue: 'from-blue-500/10 via-transparent to-transparent',
-    green: 'from-green-500/10 via-transparent to-transparent',
-    orange: 'from-orange-500/10 via-transparent to-transparent',
-    pink: 'from-pink-500/10 via-transparent to-transparent',
-    none: '',
-  }
-
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-2xl',
-        'backdrop-blur-xl theme-bg-secondary',
-        'theme-border',
-        'shadow-xl shadow-black/5',
-        hover && 'transition-all duration-300 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1',
-        glow && 'before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-white/40 before:to-transparent before:-z-10',
+        'rounded-2xl theme-bg-secondary border theme-border',
+        hover && 'transition-all duration-200 hover:shadow-sm active:scale-[0.98]',
         className
       )}
       style={{
         borderWidth: '1px',
       }}
     >
-      {gradient !== 'none' && (
-        <div
-          className={cn(
-            'absolute inset-0 bg-gradient-to-br opacity-50',
-            gradients[gradient]
-          )}
-        />
-      )}
-      <div className="relative z-10">{children}</div>
+      {children}
     </div>
   )
 }

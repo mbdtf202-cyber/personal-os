@@ -39,15 +39,14 @@ export function Sidebar() {
 
   const SidebarContent = () => (
     <>
-      <div className="relative z-10 flex h-16 items-center gap-2 px-6 theme-border" style={{ borderBottomWidth: '1px' }}>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl theme-btn-primary theme-shadow-md">
-          <Sparkles className="h-5 w-5 text-white" />
+      <div className="flex h-14 items-center gap-3 px-4 theme-border" style={{ borderBottomWidth: '1px' }}>
+        <div className="w-8 h-8 rounded-lg theme-btn-primary flex items-center justify-center">
+          <Sparkles className="h-4 w-4 text-white" />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold theme-text-primary">
+          <h1 className="text-base font-semibold theme-text-primary">
             Personal OS
           </h1>
-          <p className="text-xs theme-text-tertiary">Your Digital Life</p>
         </div>
         <Button
           variant="ghost"
@@ -59,7 +58,7 @@ export function Sidebar() {
         </Button>
       </div>
 
-      <nav className="relative z-10 flex-1 space-y-1 px-3 py-6 overflow-y-auto">
+      <nav className="flex-1 space-y-0.5 px-2 py-4 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
@@ -68,24 +67,14 @@ export function Sidebar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
                 isActive
-                  ? 'theme-bg-tertiary theme-text-primary theme-shadow-sm'
-                  : 'theme-text-secondary hover:theme-bg-tertiary hover:theme-text-primary'
+                  ? 'theme-bg-tertiary theme-text-primary'
+                  : 'theme-text-secondary hover:theme-bg-tertiary hover:theme-text-primary active:scale-95'
               )}
             >
-              <div
-                className={cn(
-                  'relative flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
-                  isActive ? 'theme-btn-primary theme-shadow-md' : 'theme-bg-tertiary'
-                )}
-              >
-                <item.icon className={cn('h-4 w-4', isActive ? 'text-white' : 'theme-text-secondary')} />
-              </div>
-
-              <span className="relative">{item.name}</span>
-
-              {isActive && <div className="absolute right-3 h-1.5 w-1.5 rounded-full theme-btn-primary" />}
+              <item.icon className="h-5 w-5" />
+              <span>{item.name}</span>
             </Link>
           )
         })}
