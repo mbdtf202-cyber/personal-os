@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
 import { bookmarksService } from '@/lib/services/bookmarks'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
+import { LinkPreviewError } from '@/lib/services/link-preview'
+import { logger } from '@/lib/logger'
 import { bookmarkSchema } from '@/lib/validations/bookmarks'
 import { linkPreviewService } from '@/lib/services/link-preview'
 import { z } from 'zod'
 
 export async function GET(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const { searchParams } = new URL(request.url)
     
     const filters = {
@@ -20,7 +22,13 @@ export async function GET(request: Request) {
     
     return NextResponse.json({ bookmarks, total: bookmarks.length })
   } catch (error) {
-    console.error('Failed to get bookmarks:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get bookmarks', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -30,7 +38,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const body = await request.json()
     
     // If URL is provided without other data, fetch preview
@@ -56,8 +64,18 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
-    
-    console.error('Failed to create bookmark:', error)
+
+    if (error instanceof LinkPreviewError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to create bookmark', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server'
 import { projectsService } from '@/lib/services/projects'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 import { projectSchema } from '@/lib/validations/projects'
-import { linkPreviewService } from '@/lib/services/link-preview'
+import { linkPreviewService, LinkPreviewError } from '@/lib/services/link-preview'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const { searchParams } = new URL(request.url)
     
     const filters = {
@@ -19,7 +20,13 @@ export async function GET(request: Request) {
     
     return NextResponse.json({ projects, total: projects.length })
   } catch (error) {
-    console.error('Failed to get projects:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get projects', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -29,7 +36,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userId = await requireAuth()
+    const userId = await requireApiAuth()
     const body = await request.json()
     
     // If URL is provided, fetch project info
@@ -50,7 +57,10 @@ export async function POST(request: Request) {
           body.language = body.language || repoInfo.language
           body.techStack = body.techStack || repoInfo.topics.join(', ')
         } catch (error) {
-          console.error('Failed to fetch GitHub info:', error)
+          logger.warn('Failed to fetch GitHub info for project', {
+            url,
+            error: error instanceof Error ? error.message : String(error),
+          })
           // Continue with manual data
         }
       } else {
@@ -61,7 +71,17 @@ export async function POST(request: Request) {
           body.description = body.description || preview.description
           body.previewImage = body.previewImage || preview.image
         } catch (error) {
-          console.error('Failed to fetch preview:', error)
+          if (error instanceof LinkPreviewError) {
+            logger.warn('Project link preview rejected', {
+              url,
+              error: error.message,
+            })
+          } else {
+            logger.warn('Failed to fetch project preview', {
+              url,
+              error: error instanceof Error ? error.message : String(error),
+            })
+          }
           // Continue with manual data
         }
       }
@@ -82,7 +102,17 @@ export async function POST(request: Request) {
       )
     }
     
-    console.error('Failed to create project:', error)
+    if (error instanceof LinkPreviewError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to create project', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

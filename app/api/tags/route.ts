@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { tagService } from '@/lib/services/tags'
-import { requireAuth } from '@/lib/auth'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 const tagSchema = z.object({
   name: z.string().min(1).max(50),
@@ -10,12 +11,18 @@ const tagSchema = z.object({
 
 export async function GET(request: Request) {
   try {
-    await requireAuth()
+    await requireApiAuth()
     const tags = await tagService.getTags()
     
     return NextResponse.json({ tags })
   } catch (error) {
-    console.error('Failed to get tags:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to get tags', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -25,7 +32,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await requireAuth()
+    await requireApiAuth()
     const body = await request.json()
     const validated = tagSchema.parse(body)
     
@@ -40,7 +47,13 @@ export async function POST(request: Request) {
       )
     }
     
-    console.error('Failed to create tag:', error)
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    logger.error('Failed to create tag', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

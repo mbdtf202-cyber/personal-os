@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAuth } from '@/lib/auth';
-import { linkPreviewService } from '@/lib/services/link-preview';
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth';
+import { linkPreviewService, LinkPreviewError } from '@/lib/services/link-preview';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 const createNewsItemSchema = z.object({
   url: z.string().url('Invalid URL format'),
@@ -11,7 +12,7 @@ const createNewsItemSchema = z.object({
 
 export async function GET(request: Request) {
   try {
-    const userId = await requireAuth();
+    const userId = await requireApiAuth();
     const { searchParams } = new URL(request.url);
 
     const type = searchParams.get('type');
@@ -36,7 +37,13 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ items, total: items.length });
   } catch (error) {
-    console.error('Failed to get news items:', error);
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    logger.error('Failed to get news items', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -46,7 +53,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userId = await requireAuth();
+    const userId = await requireApiAuth();
     const body = await request.json();
     const { url, sourceId } = createNewsItemSchema.parse(body);
 
@@ -116,7 +123,20 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error('Failed to create news item:', error);
+    if (error instanceof LinkPreviewError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    logger.error('Failed to create news item', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Failed to create news item' },
       { status: 500 }

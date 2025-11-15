@@ -1,5 +1,14 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { isIP } from 'node:net';
+import { logger } from '../logger';
+
+export class LinkPreviewError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LinkPreviewError';
+  }
+}
 
 export interface LinkPreview {
   title: string;
@@ -23,21 +32,128 @@ export interface GitHubRepoInfo {
 }
 
 export class LinkPreviewService {
+  private readonly maxContentLength = 1024 * 1024; // 1MB
+  private readonly allowedProtocols = new Set(['http:', 'https:']);
+
+  private validateUrl(input: string): URL {
+    let url: URL;
+    try {
+      url = new URL(input);
+    } catch {
+      throw new LinkPreviewError('Invalid URL');
+    }
+
+    if (!this.allowedProtocols.has(url.protocol)) {
+      throw new LinkPreviewError('Unsupported protocol');
+    }
+
+    const hostname = url.hostname.toLowerCase();
+
+    if (this.isBlockedHostname(hostname)) {
+      throw new LinkPreviewError('Access to the requested host is not allowed');
+    }
+
+    if (isIP(hostname) && this.isPrivateNetwork(hostname)) {
+      throw new LinkPreviewError('Access to private networks is not allowed');
+    }
+
+    return url;
+  }
+
+  private isBlockedHostname(hostname: string) {
+    if (!hostname) {
+      return true;
+    }
+
+    return (
+      hostname === 'localhost' ||
+      hostname === '0.0.0.0' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname.endsWith('.localhost') ||
+      hostname.endsWith('.local') ||
+      hostname.endsWith('.internal')
+    );
+  }
+
+  private isPrivateNetwork(hostname: string) {
+    const ipVersion = isIP(hostname);
+
+    if (ipVersion === 4) {
+      const octets = hostname.split('.').map(Number);
+      if (octets.length !== 4 || octets.some((octet) => Number.isNaN(octet))) {
+        return true;
+      }
+
+      return (
+        octets[0] === 10 ||
+        octets[0] === 127 ||
+        (octets[0] === 192 && octets[1] === 168) ||
+        (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+        (octets[0] === 169 && octets[1] === 254)
+      );
+    }
+
+    if (ipVersion === 6) {
+      return (
+        hostname.startsWith('fc') ||
+        hostname.startsWith('fd') ||
+        hostname.startsWith('fe80') ||
+        hostname === '::1'
+      );
+    }
+
+    return false;
+  }
+
+  private async preflight(url: URL) {
+    try {
+      const response = await axios.head(url.toString(), {
+        timeout: 5000,
+        maxRedirects: 2,
+        validateStatus: (status) => status >= 200 && status < 400,
+      });
+
+      const contentLengthHeader = response.headers['content-length'];
+      if (contentLengthHeader) {
+        const contentLength = Number(contentLengthHeader);
+        if (!Number.isNaN(contentLength) && contentLength > this.maxContentLength) {
+          throw new LinkPreviewError('Response is too large to process');
+        }
+      }
+    } catch (error) {
+      if (error instanceof LinkPreviewError) {
+        throw error;
+      }
+
+      logger.debug('Link preview preflight failed', {
+        url: url.toString(),
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   /**
    * Fetch preview information from a URL using Open Graph tags
    */
   async fetchPreview(url: string): Promise<LinkPreview> {
     try {
-      const urlObj = new URL(url);
+      const urlObj = this.validateUrl(url);
+      await this.preflight(urlObj);
+
       const domain = urlObj.hostname;
       const origin = urlObj.origin;
 
-      const response = await axios.get(url, {
+      const response = await axios.get(urlObj.toString(), {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; PersonalOS/1.0)',
         },
         timeout: 10000,
         maxRedirects: 5,
+        maxContentLength: this.maxContentLength,
+        maxBodyLength: this.maxContentLength,
+        responseType: 'text',
+        validateStatus: (status) => status >= 200 && status < 400,
       });
 
       const $ = cheerio.load(response.data);
@@ -67,7 +183,10 @@ export class LinkPreviewService {
         try {
           image = new URL(image, origin).href;
         } catch (e) {
-          console.error('Failed to resolve image URL:', e);
+          logger.debug('Failed to resolve image URL', {
+            url,
+            error: e instanceof Error ? e.message : String(e),
+          });
           image = '';
         }
       }
@@ -110,7 +229,14 @@ export class LinkPreviewService {
         type,
       };
     } catch (error) {
-      console.error('Failed to fetch preview:', error);
+      if (error instanceof LinkPreviewError) {
+        throw error;
+      }
+
+      logger.error('Failed to fetch preview', {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+      });
       try {
         const urlObj = new URL(url);
         const domain = urlObj.hostname;
@@ -227,7 +353,10 @@ export class LinkPreviewService {
         topics: data.topics || [],
       };
     } catch (error) {
-      console.error('Failed to fetch GitHub repo:', error);
+      logger.error('Failed to fetch GitHub repository information', {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw new Error('Failed to fetch GitHub repository information');
     }
   }
