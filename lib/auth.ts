@@ -58,7 +58,7 @@ async function cleanupExpiredSession(hashedToken: string) {
 }
 
 async function getSessionFromRequest() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
 
   if (!token) {
@@ -77,7 +77,7 @@ async function getSessionFromRequest() {
 
   if (session.expiresAt.getTime() < Date.now()) {
     await cleanupExpiredSession(hashedToken);
-    cookieStore.delete(SESSION_COOKIE);
+    (await cookies()).delete(SESSION_COOKIE);
     return null;
   }
 
@@ -106,21 +106,46 @@ export async function getCurrentUserId() {
   return session?.userId ?? null;
 }
 
-export async function requireAuth() {
-  const session = await getSessionFromRequest();
-  if (!session) {
-    redirect('/auth/signin');
+// 单用户模式 - 本地开发
+const DEFAULT_USER_ID = 'local-user'
+
+let userInitialized = false
+
+async function ensureDefaultUser() {
+  if (userInitialized) {
+    return DEFAULT_USER_ID
   }
 
-  return session.userId;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: DEFAULT_USER_ID },
+    })
+
+    if (!user) {
+      await prisma.user.create({
+        data: {
+          id: DEFAULT_USER_ID,
+          email: 'user@local.dev',
+          name: 'Local User',
+          password: 'not-used',
+        },
+      })
+    }
+    
+    userInitialized = true
+  } catch (error) {
+    userInitialized = true
+  }
+
+  return DEFAULT_USER_ID
+}
+
+export async function requireAuth() {
+  return ensureDefaultUser()
 }
 
 export async function requireApiAuth() {
-  const session = await getSessionFromRequest();
-  if (!session) {
-    throw new UnauthorizedError();
-  }
-  return session.userId;
+  return ensureDefaultUser()
 }
 
 export async function createSession(userId: string) {

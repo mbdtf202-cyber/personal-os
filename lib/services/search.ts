@@ -1,102 +1,120 @@
+// 全局搜索服务
 import { prisma } from '@/lib/prisma'
+import { cache } from '@/lib/cache'
 
 export class SearchService {
-  async globalSearch(userId: string, query: string, filters?: {
-    type?: string[]
-  }) {
-    const searchTerm = `%${query}%`
-    
-    const results = await Promise.all([
-      // Search blog posts
-      (!filters?.type || filters.type.includes('blog')) ? prisma.post.findMany({
-        where: {
-          userId,
-          OR: [
-            { title: { contains: query } },
-            { contentMarkdown: { contains: query } },
-          ],
-        },
-        take: 10,
-        select: {
-          id: true,
-          title: true,
-          contentMarkdown: true,
-          status: true,
-          createdAt: true,
-        },
-      }) : [],
-      
-      // Search news items
-      (!filters?.type || filters.type.includes('news')) ? prisma.newsItem.findMany({
-        where: {
-          source: { userId },
-          OR: [
-            { title: { contains: query } },
-            { summary: { contains: query } },
-          ],
-        },
-        take: 10,
-        select: {
-          id: true,
-          title: true,
-          summary: true,
-          url: true,
-          publishedAt: true,
-          source: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      }) : [],
-      
-      // Search bookmarks
-      (!filters?.type || filters.type.includes('bookmarks')) ? prisma.bookmark.findMany({
-        where: {
-          userId,
-          OR: [
-            { title: { contains: query } },
-            { description: { contains: query } },
-          ],
-        },
-        take: 10,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          url: true,
-          category: true,
-          createdAt: true,
-        },
-      }) : [],
-      
-      // Search projects
-      (!filters?.type || filters.type.includes('projects')) ? prisma.project.findMany({
-        where: {
-          userId,
-          OR: [
-            { title: { contains: query } },
-            { description: { contains: query } },
-          ],
-        },
-        take: 10,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          status: true,
-          createdAt: true,
-        },
-      }) : [],
+  async search(userId: string, query: string) {
+    if (!query || query.length < 2) {
+      return { total: 0, blog: [], news: [], bookmarks: [], projects: [], training: [] }
+    }
+
+    const cacheKey = `search:${userId}:${query}`
+    const cached = cache.get<any>(cacheKey)
+    if (cached) return cached
+
+    const searchTerm = `%${query.toLowerCase()}%`
+
+    const [blog, news, bookmarks, projects, training] = await Promise.all([
+      this.searchBlog(userId, searchTerm),
+      this.searchNews(userId, searchTerm),
+      this.searchBookmarks(userId, searchTerm),
+      this.searchProjects(userId, searchTerm),
+      this.searchTraining(userId, searchTerm),
     ])
 
-    return {
-      blog: results[0].map(item => ({ ...item, type: 'blog' })),
-      news: results[1].map(item => ({ ...item, type: 'news' })),
-      bookmarks: results[2].map(item => ({ ...item, type: 'bookmark' })),
-      projects: results[3].map(item => ({ ...item, type: 'project' })),
-      total: results[0].length + results[1].length + results[2].length + results[3].length,
+    const results = {
+      total: blog.length + news.length + bookmarks.length + projects.length + training.length,
+      blog,
+      news,
+      bookmarks,
+      projects,
+      training,
     }
+
+    cache.set(cacheKey, results, 60)
+    return results
+  }
+
+  private async searchBlog(userId: string, searchTerm: string) {
+    return await prisma.post.findMany({
+      where: {
+        userId,
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { contentMarkdown: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      take: 10,
+      orderBy: { updatedAt: 'desc' },
+    })
+  }
+
+  private async searchNews(userId: string, searchTerm: string) {
+    const sources = await prisma.newsSource.findMany({
+      where: { userId },
+      select: { id: true },
+    })
+
+    const sourceIds = sources.map(s => s.id)
+
+    return await prisma.newsItem.findMany({
+      where: {
+        sourceId: { in: sourceIds },
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { summary: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      include: { source: true },
+      take: 10,
+      orderBy: { publishedAt: 'desc' },
+    })
+  }
+
+  private async searchBookmarks(userId: string, searchTerm: string) {
+    return await prisma.bookmark.findMany({
+      where: {
+        userId,
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+          { url: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      take: 10,
+      orderBy: { createdAt: 'desc' },
+    })
+  }
+
+  private async searchProjects(userId: string, searchTerm: string) {
+    return await prisma.project.findMany({
+      where: {
+        userId,
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+          { techStack: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      take: 10,
+      orderBy: { updatedAt: 'desc' },
+    })
+  }
+
+  private async searchTraining(userId: string, searchTerm: string) {
+    const notes = await prisma.trainingNote.findMany({
+      where: {
+        userId,
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { contentMd: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      take: 5,
+      orderBy: { updatedAt: 'desc' },
+    })
+
+    return notes
   }
 }
 

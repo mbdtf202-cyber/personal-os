@@ -1,0 +1,192 @@
+/* Theme System - Applied via CSS Variables */
+
+/* Primary backgrounds */
+[style*="--bg-primary"] {
+  background-color: var(--bg-primary);
+}
+
+/* Secondary backgrounds */
+[style*="--bg-secondary"] {
+  background-color: var(--bg-secondary);
+}
+
+/* Tertiary backgrounds */
+[style*="--bg-tertiary"] {
+  background-color: var(--bg-tertiary);
+}
+
+/* Text colors */
+[style*="--text-primary"] {
+  color: var(--text-primary);
+}
+
+[style*="--text-secondary"] {
+  color: var(--text-secondary);
+}
+
+[style*="--text-tertiary"] {
+  color: var(--text-tertiary);
+}
+
+/* Border colors */
+[style*="--border-color"] {
+  border-color: var(--border-color);
+}
+
+/* Accent colors */
+[style*="--color-primary"] {
+  color: var(--color-primary);
+}
+
+[style*="--color-success"] {
+  color: var(--color-success);
+}
+
+[style*="--color-warning"] {
+  color: var(--color-warning);
+}
+
+[style*="--color-danger"] {
+  color: var(--color-danger);
+}
+
+/* Shadows */
+[style*="--shadow-sm"] {
+  box-shadow: var(--shadow-sm);
+}
+
+[style*="--shadow-md"] {
+  box-shadow: var(--shadow-md);
+}
+
+[style*="--shadow-lg"] {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Theme-aware components */
+.theme-bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.theme-bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.theme-border {
+  border-color: var(--border-color);
+}
+
+.theme-border-light {
+  border-color: var(--border-light);
+}
+
+.theme-color-primary {
+  color: var(--color-primary);
+}
+
+.theme-color-success {
+  color: var(--color-success);
+}
+
+.theme-color-warning {
+  color: var(--color-warning);
+}
+
+.theme-color-danger {
+  color: var(--color-danger);
+}
+
+.theme-shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.theme-shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Button theming */
+.theme-btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.theme-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.theme-btn-success {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.theme-btn-success:hover {
+  opacity: 0.9;
+}
+
+.theme-btn-warning {
+  background-color: var(--color-warning);
+  color: white;
+}
+
+.theme-btn-warning:hover {
+  opacity: 0.9;
+}
+
+.theme-btn-danger {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.theme-btn-danger:hover {
+  opacity: 0.9;
+}
+
+/* Card theming */
+.theme-card {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Input theming */
+.theme-input {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.theme-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Badge theming */
+.theme-badge {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Transitions for smooth theme switching */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}

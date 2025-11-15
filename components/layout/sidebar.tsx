@@ -13,10 +13,12 @@ import {
   FolderKanban,
   Bookmark,
   GraduationCap,
+  Sparkles,
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Workflows', href: '/workflows', icon: Sparkles },
   { name: 'Training', href: '/training', icon: GraduationCap },
   { name: 'Health', href: '/health', icon: Heart },
   { name: 'Blog', href: '/blog', icon: FileText },
@@ -31,15 +33,20 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full w-72 flex-col border-r border-white/40 bg-white/60 px-6 py-8 text-slate-700 shadow-[0_30px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-100">
-      <div className="flex items-center gap-2 pb-10">
-        <span className="text-2xl font-semibold tracking-tight">
-          <span className="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
+    <div className="relative flex h-full w-64 flex-col overflow-hidden theme-bg-secondary theme-border" style={{ borderRightWidth: '1px' }}>
+      <div className="relative z-10 flex h-16 items-center gap-2 px-6 theme-border" style={{ borderBottomWidth: '1px' }}>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl theme-btn-primary theme-shadow-md">
+          <Sparkles className="h-5 w-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold theme-text-primary">
             Personal OS
-          </span>
-        </span>
+          </h1>
+          <p className="text-xs theme-text-tertiary">Your Digital Life</p>
+        </div>
       </div>
-      <nav className="flex-1 space-y-2">
+
+      <nav className="relative z-10 flex-1 space-y-1 px-3 py-6">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
@@ -47,31 +54,30 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               className={cn(
-                'group flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-all duration-300',
+                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'border-transparent bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_12px_30px_rgba(79,70,229,0.35)]'
-                  : 'border-transparent text-slate-500 hover:border-white/70 hover:bg-white/80 hover:text-slate-900 dark:hover:border-white/10 dark:hover:bg-white/10'
+                  ? 'theme-bg-tertiary theme-text-primary theme-shadow-sm'
+                  : 'theme-text-secondary hover:theme-bg-tertiary hover:theme-text-primary'
               )}
             >
-              <item.icon
+              <div
                 className={cn(
-                  'h-5 w-5 transition-colors duration-300',
-                  isActive
-                    ? 'text-white'
-                    : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-300 dark:group-hover:text-white'
+                  'relative flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
+                  isActive ? 'theme-btn-primary theme-shadow-md' : 'theme-bg-tertiary'
                 )}
-              />
-              <span>{item.name}</span>
+              >
+                <item.icon className={cn('h-4 w-4', isActive ? 'text-white' : 'theme-text-secondary')} />
+              </div>
+
+              <span className="relative">{item.name}</span>
+
+              {isActive && <div className="absolute right-3 h-1.5 w-1.5 rounded-full theme-btn-primary" />}
             </Link>
           )
         })}
       </nav>
-      <div className="mt-10 rounded-3xl border border-white/50 bg-white/70 p-4 text-xs text-slate-500 shadow-inner backdrop-blur-lg dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
-        <p className="font-medium text-slate-600 dark:text-slate-100">Stay inspired</p>
-        <p className="mt-1 leading-relaxed">
-          Curate your life with clarity and focus. Every board reflects your personal operating rhythm.
-        </p>
-      </div>
+
+
     </div>
   )
 }

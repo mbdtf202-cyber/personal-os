@@ -41,7 +41,7 @@ model User {
   id        String    @id @default(cuid())
   email     String    @unique
   name      String
-  passwordHash String
+  passwordHash String?
   avatar    String?
   timezone  String    @default("Asia/Shanghai")
   createdAt DateTime  @default(now())
@@ -61,6 +61,7 @@ model User {
   trainingResources TrainingResource[]
   trainingBugs      TrainingBug[]
   trainingProgress  TrainingProgress[]
+  workflows         Workflow[]
   sessions          Session[]
 }
 
@@ -448,4 +449,43 @@ model TrainingProgress {
   
   @@unique([userId, domain, skill])
   @@index([userId, domain])
+}
+
+model Workflow {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  steps       String          // JSON array of steps
+  trigger     String          // manual, scheduled, event
+  schedule    String?         // cron expression for scheduled workflows
+  status      String          @default("DRAFT") // DRAFT, ACTIVE, PAUSED
+  
+  lastRunAt   DateTime?
+  runCount    Int             @default(0)
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  runs        WorkflowRun[]
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model WorkflowRun {
+  id          String          @id @default(cuid())
+  workflowId  String
+  workflow    Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  
+  status      String          // RUNNING, COMPLETED, FAILED
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  error       String?
+  logs        String?         // JSON array of log entries
+  
+  @@index([workflowId])
+  @@index([status])
 }

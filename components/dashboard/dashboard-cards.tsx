@@ -1,8 +1,8 @@
-import { DashboardCard } from '@/components/dashboard/dashboard-card'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { GlassCard } from '@/components/ui/glass-card'
 import {
   Heart,
   FileText,
@@ -11,8 +11,7 @@ import {
   TrendingUp,
   FolderKanban,
   Bookmark,
-  CheckCircle,
-  AlertCircle,
+  ArrowRight,
 } from 'lucide-react'
 
 interface DashboardCardsProps {
@@ -33,7 +32,14 @@ interface DashboardCardsProps {
         id: string
         title: string
         platform: string
-        plannedPublishTime: string | Date
+        plannedPublishTime: Date | null
+        status: string
+        url: string | null
+        createdAt: Date
+        updatedAt: Date
+        userId: string
+        contentText: string
+        actualPublishTime: Date | null
       }>
     }
     trading: {
@@ -49,90 +55,98 @@ interface DashboardCardsProps {
 }
 
 export function DashboardCards({ overview }: DashboardCardsProps) {
+  const cards = [
+    {
+      title: '健康追踪',
+      value: overview.health.hasLog ? '已记录' : '未记录',
+      description:
+        overview.health.pendingHabits > 0
+          ? `${overview.health.pendingHabits} 个习惯待完成`
+          : '记录今日状态保持节奏',
+      icon: Heart,
+      href: '/health',
+    },
+    {
+      title: '博客草稿',
+      value: overview.blog.draftCount,
+      description: '灵感草稿等待打磨',
+      icon: FileText,
+      href: '/blog',
+    },
+    {
+      title: '未读新闻',
+      value: overview.news.unreadCount,
+      description: '精选资讯保持输入',
+      icon: Newspaper,
+      href: '/news',
+    },
+    {
+      title: '今日发布',
+      value: overview.social.scheduledToday,
+      description: '社交内容排期',
+      icon: Share2,
+      href: '/social',
+    },
+    {
+      title: '今日交易',
+      value: overview.trading.tradesCount,
+      description: '记录市场表现',
+      icon: TrendingUp,
+      href: '/trading',
+    },
+    {
+      title: '活跃项目',
+      value: overview.projects.activeCount,
+      description: '正在推进的项目',
+      icon: FolderKanban,
+      href: '/projects',
+    },
+    {
+      title: '待读书签',
+      value: overview.bookmarks.toReadCount,
+      description: '灵感收集箱',
+      icon: Bookmark,
+      href: '/bookmarks',
+    },
+  ]
+
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <DashboardCard
-          title="Health"
-          icon={Heart}
-          description="Daily wellbeing snapshot"
-          action={{ label: 'Open health hub', href: '/health' }}
-        >
-          <div className="space-y-3">
-            {overview.health.hasLog ? (
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-200">
-                <CheckCircle className="h-4 w-4" />
-                Logged today
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => (
+          <Link key={card.title} href={card.href}>
+            <GlassCard hover glow>
+              <div className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium theme-text-secondary">
+                      {card.title}
+                    </p>
+                    <p className="mt-2 text-3xl font-bold tracking-tight theme-text-primary">
+                      {card.value}
+                    </p>
+                    <p className="mt-2 text-xs theme-text-tertiary">
+                      {card.description}
+                    </p>
+                  </div>
+                  <div className="rounded-xl theme-bg-tertiary p-3">
+                    <card.icon className="h-6 w-6 theme-text-secondary" />
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center text-sm font-medium theme-color-primary">
+                  查看详情
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </div>
               </div>
-            ) : (
-              <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-600 dark:bg-amber-500/20 dark:text-amber-200">
-                <AlertCircle className="h-4 w-4" />
-                Not logged yet
-              </div>
-            )}
-            {overview.health.pendingHabits > 0 && (
-              <p className="text-sm text-slate-500 dark:text-slate-300">
-                {overview.health.pendingHabits} habit{overview.health.pendingHabits === 1 ? '' : 's'} waiting for attention.
-              </p>
-            )}
-          </div>
-        </DashboardCard>
-
-        <DashboardCard
-          title="Blog"
-          icon={FileText}
-          description="Ideas ready to publish"
-          value={overview.blog.draftCount}
-          action={{ label: 'Go to blog', href: '/blog' }}
-        />
-
-        <DashboardCard
-          title="News"
-          icon={Newspaper}
-          description="Unread curated stories"
-          value={overview.news.unreadCount}
-          action={{ label: 'Browse news', href: '/news' }}
-        />
-
-        <DashboardCard
-          title="Social"
-          icon={Share2}
-          description="Scheduled posts today"
-          value={overview.social.scheduledToday}
-          action={{ label: 'Open social desk', href: '/social' }}
-        />
-
-        <DashboardCard
-          title="Trading"
-          icon={TrendingUp}
-          description="Trades recorded today"
-          value={overview.trading.tradesCount}
-          action={{ label: 'Review trades', href: '/trading' }}
-        />
-
-        <DashboardCard
-          title="Projects"
-          icon={FolderKanban}
-          description="Active focus streams"
-          value={overview.projects.activeCount}
-          action={{ label: 'View projects', href: '/projects' }}
-        />
-
-        <DashboardCard
-          title="Bookmarks"
-          icon={Bookmark}
-          description="Articles saved to read"
-          value={overview.bookmarks.toReadCount}
-          action={{ label: 'Open bookmarks', href: '/bookmarks' }}
-        />
+            </GlassCard>
+          </Link>
+        ))}
       </div>
 
       {overview.social.scheduledToday > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-600 dark:text-white">
-              Scheduled Posts Today
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold">Scheduled Posts Today</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {overview.social.posts.map((post) => (
@@ -141,13 +155,13 @@ export function DashboardCards({ overview }: DashboardCardsProps) {
                 className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_18px_40px_rgba(79,70,229,0.18)] dark:border-white/10 dark:bg-white/5"
               >
                 <div>
-                  <p className="font-medium text-slate-700 dark:text-white">{post.title}</p>
+                  <p className="font-medium theme-text-primary">{post.title}</p>
                   <div className="mt-2 flex items-center gap-2">
-                    <Badge variant="outline" className="rounded-full border-white/60 px-2 text-xs text-slate-500 dark:border-white/10 dark:text-slate-200">
+                    <Badge variant="outline" className="rounded-full theme-border px-2 text-xs theme-text-secondary" style={{ borderWidth: '1px' }}>
                       {post.platform}
                     </Badge>
-                    <span className="text-xs text-slate-400 dark:text-slate-300">
-                      {new Date(post.plannedPublishTime).toLocaleTimeString()}
+                    <span className="text-xs theme-text-tertiary">
+                      {post.plannedPublishTime ? new Date(post.plannedPublishTime).toLocaleTimeString() : '未定时'}
                     </span>
                   </div>
                 </div>

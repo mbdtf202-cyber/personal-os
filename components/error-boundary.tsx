@@ -1,11 +1,13 @@
+// 错误边界组件
 'use client'
 
 import { Component, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertCircle } from 'lucide-react'
 
 interface Props {
   children: ReactNode
+  fallback?: ReactNode
 }
 
 interface State {
@@ -29,26 +31,31 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback
+      }
+
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <Card className="max-w-md w-full">
-            <CardHeader>
-              <CardTitle className="text-red-600">Something went wrong</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {this.state.error?.message || 'An unexpected error occurred'}
-              </p>
-              <Button
-                onClick={() => {
-                  this.setState({ hasError: false })
-                  window.location.reload()
-                }}
-              >
-                Reload Page
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="flex min-h-screen items-center justify-center p-6">
+          <div className="max-w-md text-center">
+            <div className="mb-4 inline-flex rounded-full bg-red-100 dark:bg-red-900/20 p-4">
+              <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+              出错了
+            </h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
+              {this.state.error?.message || '发生了未知错误'}
+            </p>
+            <Button
+              onClick={() => {
+                this.setState({ hasError: false })
+                window.location.reload()
+              }}
+            >
+              刷新页面
+            </Button>
+          </div>
         </div>
       )
     }

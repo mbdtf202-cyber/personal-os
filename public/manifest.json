@@ -1,0 +1,42 @@
+{
+  "name": "Personal OS",
+  "short_name": "Personal OS",
+  "description": "个人管理系统 - 健康、学习、项目、交易一站式管理",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle", "health"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "健康记录",
+      "short_name": "健康",
+      "description": "快速记录健康数据",
+      "url": "/health",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "学习笔记",
+      "short_name": "学习",
+      "description": "创建学习笔记",
+      "url": "/training",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -111,19 +111,20 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="group flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-2.5 text-sm font-medium text-slate-500 shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-all hover:scale-[1.01] hover:text-slate-700 hover:shadow-[0_18px_40px_rgba(79,70,229,0.15)] focus:outline-none focus:ring-2 focus:ring-sky-200 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-300"
+        className="group flex items-center gap-2 rounded-full theme-border theme-bg-tertiary px-5 py-2.5 text-sm font-medium theme-text-secondary theme-shadow-md transition-all hover:scale-[1.01] hover:theme-text-primary focus:outline-none focus:ring-2 focus:ring-sky-200 backdrop-blur-xl"
+        style={{ borderWidth: '1px' }}
       >
-        <Search className="h-4 w-4 text-sky-500 transition-colors group-hover:text-indigo-500" />
+        <Search className="h-4 w-4 theme-color-primary transition-colors" />
         <span className="hidden text-sm sm:inline">Search the workspace</span>
-        <kbd className="hidden items-center gap-1 rounded-full border border-white/50 bg-white/80 px-2 py-0.5 font-mono text-[10px] text-slate-400 shadow-sm sm:flex dark:border-white/10 dark:bg-white/10 dark:text-slate-200">
+        <kbd className="hidden items-center gap-1 rounded-full theme-border theme-bg-secondary px-2 py-0.5 font-mono text-[10px] theme-text-tertiary shadow-sm sm:flex" style={{ borderWidth: '1px' }}>
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto rounded-[2rem] border-white/60 bg-white/80 p-6 shadow-[0_40px_90px_rgba(15,23,42,0.2)] backdrop-blur-3xl dark:border-white/10 dark:bg-slate-900/80">
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto rounded-[2rem] theme-border theme-bg-secondary p-6 theme-shadow-lg backdrop-blur-3xl" style={{ borderWidth: '1px' }}>
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-slate-700 dark:text-white">
+            <DialogTitle className="text-lg font-semibold theme-text-primary">
               Search
             </DialogTitle>
           </DialogHeader>
@@ -133,36 +134,38 @@ export function GlobalSearch() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
-              className="h-12 rounded-full border-white/50 bg-white/80 px-5 text-base shadow-inner shadow-white/40 focus:border-sky-300 focus:ring-sky-200 dark:border-white/10 dark:bg-white/10"
+              className="h-12 rounded-full theme-border theme-bg-tertiary px-5 text-base theme-text-primary shadow-inner focus:border-sky-300 focus:ring-sky-200"
+              style={{ borderWidth: '1px' }}
             />
 
             {loading && (
-              <div className="py-10 text-center text-sm text-slate-400">Searching...</div>
+              <div className="py-10 text-center text-sm theme-text-tertiary">Searching...</div>
             )}
 
             {results && results.total === 0 && (
-              <div className="py-10 text-center text-sm text-slate-400">No results found</div>
+              <div className="py-10 text-center text-sm theme-text-tertiary">No results found</div>
             )}
 
             {results && results.total > 0 && (
               <div className="space-y-6">
                 {results.blog.length > 0 && (
                   <div>
-                    <h3 className="mb-3 text-sm font-semibold text-slate-500">Blog Posts</h3>
+                    <h3 className="mb-3 text-sm font-semibold theme-text-secondary">Blog Posts</h3>
                     <div className="space-y-2">
                       {results.blog.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => handleResultClick('blog', item.id)}
-                          className="w-full rounded-2xl border border-white/60 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_20px_40px_rgba(79,70,229,0.18)] dark:border-white/10 dark:bg-white/10"
+                          className="w-full rounded-2xl theme-border theme-bg-tertiary p-4 text-left transition hover:-translate-y-0.5 theme-shadow-sm"
+                          style={{ borderWidth: '1px' }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-500">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl theme-btn-primary">
                               {getIcon('blog')}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-slate-700 dark:text-white">{item.title}</p>
-                              <Badge variant="outline" className="mt-2 rounded-full border-white/50 px-2 text-[11px] text-slate-500 dark:border-white/10 dark:text-slate-200">
+                              <p className="font-medium theme-text-primary">{item.title}</p>
+                              <Badge variant="outline" className="mt-2 rounded-full theme-border px-2 text-[11px] theme-text-secondary" style={{ borderWidth: '1px' }}>
                                 {item.status}
                               </Badge>
                             </div>
@@ -175,21 +178,22 @@ export function GlobalSearch() {
 
                 {results.news.length > 0 && (
                   <div>
-                    <h3 className="mb-3 text-sm font-semibold text-slate-500">News</h3>
+                    <h3 className="mb-3 text-sm font-semibold theme-text-secondary">News</h3>
                     <div className="space-y-2">
                       {results.news.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => handleResultClick('news', item.id)}
-                          className="w-full rounded-2xl border border-white/60 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_20px_40px_rgba(79,70,229,0.18)] dark:border-white/10 dark:bg-white/10"
+                          className="w-full rounded-2xl theme-border theme-bg-tertiary p-4 text-left transition hover:-translate-y-0.5 theme-shadow-sm"
+                          style={{ borderWidth: '1px' }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-500">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl theme-btn-primary">
                               {getIcon('news')}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-slate-700 dark:text-white">{item.title}</p>
-                              <p className="mt-2 text-xs text-slate-400 dark:text-slate-300">{item.source.name}</p>
+                              <p className="font-medium theme-text-primary">{item.title}</p>
+                              <p className="mt-2 text-xs theme-text-tertiary">{item.source.name}</p>
                             </div>
                           </div>
                         </button>
@@ -200,22 +204,23 @@ export function GlobalSearch() {
 
                 {results.bookmarks.length > 0 && (
                   <div>
-                    <h3 className="mb-3 text-sm font-semibold text-slate-500">Bookmarks</h3>
+                    <h3 className="mb-3 text-sm font-semibold theme-text-secondary">Bookmarks</h3>
                     <div className="space-y-2">
                       {results.bookmarks.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => handleResultClick('bookmark', item.id)}
-                          className="w-full rounded-2xl border border-white/60 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_20px_40px_rgba(79,70,229,0.18)] dark:border-white/10 dark:bg-white/10"
+                          className="w-full rounded-2xl theme-border theme-bg-tertiary p-4 text-left transition hover:-translate-y-0.5 theme-shadow-sm"
+                          style={{ borderWidth: '1px' }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-500">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl theme-btn-success">
                               {getIcon('bookmark')}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-slate-700 dark:text-white">{item.title}</p>
+                              <p className="font-medium theme-text-primary">{item.title}</p>
                               {item.description && (
-                                <p className="mt-2 text-xs text-slate-400 dark:text-slate-300 line-clamp-1">
+                                <p className="mt-2 text-xs theme-text-tertiary line-clamp-1">
                                   {item.description}
                                 </p>
                               )}
@@ -229,21 +234,22 @@ export function GlobalSearch() {
 
                 {results.projects.length > 0 && (
                   <div>
-                    <h3 className="mb-3 text-sm font-semibold text-slate-500">Projects</h3>
+                    <h3 className="mb-3 text-sm font-semibold theme-text-secondary">Projects</h3>
                     <div className="space-y-2">
                       {results.projects.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => handleResultClick('project', item.id)}
-                          className="w-full rounded-2xl border border-white/60 bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_20px_40px_rgba(79,70,229,0.18)] dark:border-white/10 dark:bg-white/10"
+                          className="w-full rounded-2xl theme-border theme-bg-tertiary p-4 text-left transition hover:-translate-y-0.5 theme-shadow-sm"
+                          style={{ borderWidth: '1px' }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-100 text-purple-500">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl theme-btn-warning">
                               {getIcon('project')}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-slate-700 dark:text-white">{item.title}</p>
-                              <Badge variant="outline" className="mt-2 rounded-full border-white/50 px-2 text-[11px] text-slate-500 dark:border-white/10 dark:text-slate-200">
+                              <p className="font-medium theme-text-primary">{item.title}</p>
+                              <Badge variant="outline" className="mt-2 rounded-full theme-border px-2 text-[11px] theme-text-secondary" style={{ borderWidth: '1px' }}>
                                 {item.status}
                               </Badge>
                             </div>

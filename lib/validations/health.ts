@@ -25,3 +25,18 @@ export const habitCheckinSchema = z.object({
   date: z.coerce.date(),
   done: z.boolean().default(true),
 })
+
+export const createHealthLogSchema = z.object({
+  date: z.string().datetime(),
+  sleepHours: z.number().min(0).max(24).optional(),
+  exerciseMinutes: z.number().min(0).max(1440).optional(),
+  moodScore: z.number().min(1).max(10),
+  energyScore: z.number().min(1).max(10),
+  stressLevel: z.number().min(1).max(10),
+  remark: z.string().optional(),
+})
+
+export const updateHealthLogSchema = createHealthLogSchema.partial()
+
+export type CreateHealthLogInput = z.infer<typeof createHealthLogSchema>
+export type UpdateHealthLogInput = z.infer<typeof updateHealthLogSchema>

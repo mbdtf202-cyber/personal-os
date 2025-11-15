@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   try {
     const userId = await requireApiAuth()
     const { searchParams } = new URL(request.url)
-    
+
     const query = searchParams.get('q')
     if (!query || query.trim().length === 0) {
       return NextResponse.json(
@@ -17,10 +17,32 @@ export async function GET(request: Request) {
     }
 
     const typeParam = searchParams.get('type')
-    const filters = typeParam ? { type: typeParam.split(',') } : undefined
-    
-    const results = await searchService.globalSearch(userId, query, filters)
-    
+    const requestedTypes = typeParam
+      ? new Set(typeParam.split(',').map((type) => type.trim()).filter(Boolean))
+      : null
+
+    const results = await searchService.search(userId, query)
+
+    if (requestedTypes) {
+      const filtered = {
+        ...results,
+        blog: requestedTypes.has('blog') ? results.blog : [],
+        news: requestedTypes.has('news') ? results.news : [],
+        bookmarks: requestedTypes.has('bookmark') ? results.bookmarks : [],
+        projects: requestedTypes.has('project') ? results.projects : [],
+        training: requestedTypes.has('training') ? results.training : [],
+      }
+
+      filtered.total =
+        filtered.blog.length +
+        filtered.news.length +
+        filtered.bookmarks.length +
+        filtered.projects.length +
+        filtered.training.length
+
+      return NextResponse.json(filtered)
+    }
+
     return NextResponse.json(results)
   } catch (error) {
     if (error instanceof UnauthorizedError) {

@@ -1,84 +1,52 @@
-import { NextResponse } from 'next/server'
-import { bookmarksService } from '@/lib/services/bookmarks'
-import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
-import { LinkPreviewError } from '@/lib/services/link-preview'
-import { logger } from '@/lib/logger'
-import { bookmarkSchema } from '@/lib/validations/bookmarks'
-import { linkPreviewService } from '@/lib/services/link-preview'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { handleApiError, validateRequest } from '@/lib/api-error'
+import { createBookmarkSchema } from '@/lib/validations/bookmark'
 
-export async function GET(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const userId = await requireApiAuth()
-    const { searchParams } = new URL(request.url)
+    const userId = await requireAuth()
+    const body = await request.json()
     
-    const filters = {
-      category: searchParams.get('category') || undefined,
-      status: searchParams.get('status') || undefined,
-      type: searchParams.get('type') || undefined,
-    }
-    
-    const bookmarks = await bookmarksService.getBookmarks(userId, filters)
-    
-    return NextResponse.json({ bookmarks, total: bookmarks.length })
-  } catch (error) {
-    if (error instanceof UnauthorizedError) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const validatedData = validateRequest(body, createBookmarkSchema)
 
-    logger.error('Failed to get bookmarks', {
-      error: error instanceof Error ? error.message : String(error),
+    const bookmark = await prisma.bookmark.create({
+      data: {
+        userId,
+        url: validatedData.url,
+        title: validatedData.title,
+        description: validatedData.description,
+        category: validatedData.category,
+        status: 'TO_READ',
+      },
     })
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+
+    return NextResponse.json(bookmark, { status: 201 })
+  } catch (error) {
+    return handleApiError(error)
   }
 }
 
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const userId = await requireApiAuth()
-    const body = await request.json()
-    
-    // If URL is provided without other data, fetch preview
-    if (body.url && !body.title) {
-      const preview = await linkPreviewService.fetchPreview(body.url)
-      body.title = preview.title
-      body.description = preview.description
-      body.siteName = preview.siteName
-      body.domain = preview.domain
-      body.faviconUrl = preview.faviconUrl
-      body.imageUrl = preview.image
-      body.type = preview.type
-    }
-    
-    const validated = bookmarkSchema.parse(body)
-    const bookmark = await bookmarksService.createBookmark(userId, validated)
-    
-    return NextResponse.json(bookmark, { status: 201 })
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
-        { status: 400 }
-      )
-    }
+    const userId = await requireAuth()
+    const searchParams = request.nextUrl.searchParams
+    const category = searchParams.get('category')
+    const status = searchParams.get('status')
 
-    if (error instanceof LinkPreviewError) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
+    const where: any = { userId }
+    if (category) where.category = category
+    if (status) where.status = status
 
-    if (error instanceof UnauthorizedError) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    logger.error('Failed to create bookmark', {
-      error: error instanceof Error ? error.message : String(error),
+    const bookmarks = await prisma.bookmark.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: 50,
     })
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+
+    return NextResponse.json(bookmarks)
+  } catch (error) {
+    return handleApiError(error)
   }
 }

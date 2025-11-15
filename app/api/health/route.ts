@@ -1,34 +1,27 @@
-import { NextResponse } from 'next/server';
-import { verifyDatabaseConnection } from '@/lib/prisma';
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const dbConnected = await verifyDatabaseConnection();
-
-    if (!dbConnected) {
-      return NextResponse.json(
-        {
-          status: 'unhealthy',
-          database: 'disconnected',
-          timestamp: new Date().toISOString(),
-        },
-        { status: 503 }
-      );
-    }
+    // 检查数据库连接
+    await prisma.$queryRaw`SELECT 1`
 
     return NextResponse.json({
       status: 'healthy',
-      database: 'connected',
       timestamp: new Date().toISOString(),
-    });
+      checks: {
+        database: 'ok',
+        api: 'ok',
+      },
+    })
   } catch (error) {
     return NextResponse.json(
       {
-        status: 'error',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        status: 'unhealthy',
         timestamp: new Date().toISOString(),
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
-    );
+      { status: 503 }
+    )
   }
 }
