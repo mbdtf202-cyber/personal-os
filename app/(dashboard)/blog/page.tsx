@@ -2,6 +2,9 @@ import { requireAuth } from '@/lib/auth'
 import { blogService } from '@/lib/services/blog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/layout/page-header'
+import { PageSection } from '@/components/layout/page-section'
+import { GlassCard } from '@/components/ui/glass-card'
 import Link from 'next/link'
 import { format } from 'date-fns'
 
@@ -10,44 +13,55 @@ export default async function BlogPage() {
   const posts = await blogService.getPosts(userId)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Blog</h1>
-          <p className="text-gray-600 mt-1">Write and manage your blog posts</p>
-        </div>
-        <Link href="/blog/new">
-          <Button>New Post</Button>
-        </Link>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="写作工作台"
+        description="以 iOS 质感管理创作节奏，所有文章在这里实时同步。"
+        accent="lavender"
+        actions={(
+          <Link href="/blog/new">
+            <Button className="theme-btn-primary">新文章</Button>
+          </Link>
+        )}
+      />
 
-      <div className="space-y-4">
+      <PageSection title="文章列表" description="最近的创作与状态">
         {posts.length === 0 ? (
-          <div className="rounded-lg border bg-white p-8 text-center">
-            <p className="text-gray-500">No posts yet. Create your first post!</p>
+          <div className="py-12 text-center theme-text-secondary">
+            还没有文章，马上开始创作吧。
           </div>
         ) : (
-          posts.map((post) => (
-            <Link key={post.id} href={`/blog/${post.id}`}>
-              <div className="rounded-lg border bg-white p-6 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold">{post.title}</h3>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
-                      <span>{format(new Date(post.createdAt), 'MMM dd, yyyy')}</span>
-                      <span>•</span>
-                      <span>{post.category}</span>
+          <div className="space-y-4">
+            {posts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/blog/${post.id}`}
+                className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 rounded-[1.75rem]"
+              >
+                <GlassCard className="p-5 hover:-translate-y-0.5 transition-transform">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <p className="text-xs uppercase tracking-[0.3em] theme-text-tertiary">
+                        {post.category}
+                      </p>
+                      <h3 className="text-xl font-semibold theme-text-primary">{post.title}</h3>
+                      <p className="text-sm theme-text-secondary">
+                        {format(new Date(post.createdAt), 'yyyy-MM-dd')} · {post.category}
+                      </p>
                     </div>
+                    <Badge
+                      variant={post.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                      className="rounded-full px-4"
+                    >
+                      {post.status}
+                    </Badge>
                   </div>
-                  <Badge variant={post.status === 'PUBLISHED' ? 'default' : 'secondary'}>
-                    {post.status}
-                  </Badge>
-                </div>
-              </div>
-            </Link>
-          ))
+                </GlassCard>
+              </Link>
+            ))}
+          </div>
         )}
-      </div>
+      </PageSection>
     </div>
   )
 }

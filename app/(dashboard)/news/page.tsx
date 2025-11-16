@@ -6,62 +6,55 @@ import { NewsCard } from '@/components/news/news-card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { useNewsItems } from '@/hooks/useNewsItems'
+import { PageHeader } from '@/components/layout/page-header'
+import { PageSection } from '@/components/layout/page-section'
 
 export default function NewsPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'favorites'>('all')
   const { items, isPending, isError, refetch, queryKey, error } = useNewsItems(filter)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">News</h1>
-          <p className="text-muted-foreground mt-1">
-            Your curated news feed
-          </p>
-        </div>
-        <AddNewsLinkDialog onSuccess={() => refetch()} />
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="资讯中心"
+        description="追踪你订阅的所有文章与链接，支持一键收藏、标记已读。"
+        accent="sunset"
+        actions={<AddNewsLinkDialog onSuccess={() => refetch()} />}
+      />
 
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread' | 'favorites')}>
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="unread">Unread</TabsTrigger>
-          <TabsTrigger value="favorites">Favorites</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <PageSection title="阅读状态" description="按状态快速过滤">
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread' | 'favorites')}>
+          <TabsList className="rounded-full bg-white/60 p-1">
+            <TabsTrigger value="all">全部</TabsTrigger>
+            <TabsTrigger value="unread">未读</TabsTrigger>
+            <TabsTrigger value="favorites">收藏</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      {isPending ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      ) : isError ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-2">Unable to load news items.</p>
-          <Button
-            variant="link"
-            className="h-auto p-0 text-sm"
-            onClick={() => refetch()}
-          >
-            Try again
-          </Button>
-          {error instanceof Error && (
-            <p className="mt-2 text-xs text-muted-foreground">{error.message}</p>
-          )}
-        </div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">
-            No news items yet. Add your first link!
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {items.map((item) => (
-            <NewsCard key={item.id} item={item} queryKey={queryKey} />
-          ))}
-        </div>
-      )}
+        {isPending ? (
+          <div className="text-center py-12 theme-text-secondary">加载中...</div>
+        ) : isError ? (
+          <div className="text-center py-12 space-y-2">
+            <p className="theme-text-secondary">无法加载资讯。</p>
+            <Button variant="link" className="h-auto p-0" onClick={() => refetch()}>
+              重试
+            </Button>
+            {error instanceof Error && (
+              <p className="text-xs theme-text-tertiary">{error.message}</p>
+            )}
+          </div>
+        ) : items.length === 0 ? (
+          <div className="text-center py-12 theme-text-secondary">
+            暂无内容，先添加一条链接吧。
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {items.map((item) => (
+              <NewsCard key={item.id} item={item} queryKey={queryKey} />
+            ))}
+          </div>
+        )}
+      </PageSection>
     </div>
   )
 }

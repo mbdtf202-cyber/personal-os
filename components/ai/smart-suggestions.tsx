@@ -1,15 +1,20 @@
 // AI 智能建议组件
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { GlassCard } from '@/components/ui/glass-card'
 import { Button } from '@/components/ui/button'
-import { Sparkles, TrendingUp, Target, Lightbulb, X } from 'lucide-react'
+import { Sparkles, TrendingUp, Target, Lightbulb, X, Rocket, Gauge } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+type ExtendedWindow = Window & typeof globalThis & {
+  requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number
+  cancelIdleCallback?: (handle: number) => void
+}
 
 interface Suggestion {
   id: string
-  type: 'insight' | 'action' | 'tip' | 'goal'
+  type: 'insight' | 'action' | 'tip' | 'goal' | 'upgrade' | 'performance'
   title: string
   description: string
   action?: {
@@ -28,11 +33,8 @@ export function SmartSuggestions({ userId, className }: SmartSuggestionsProps) {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadSuggestions()
-  }, [userId])
-
-  const loadSuggestions = async () => {
+  const loadSuggestions = useCallback(async () => {
+    void userId
     setLoading(true)
     try {
       // 模拟 AI 生成的建议
@@ -77,15 +79,44 @@ export function SmartSuggestions({ userId, className }: SmartSuggestionsProps) {
             href: '/projects',
           },
         },
+        {
+          id: '5',
+          type: 'upgrade',
+          title: '功能优化：统一提醒中心',
+          description: '建议把健康、交易、项目等提醒聚合在一个系统通知中心，方便跨设备同步。',
+          action: {
+            label: '查看路线图',
+            href: '/workflows',
+          },
+        },
+        {
+          id: '6',
+          type: 'performance',
+          title: '性能优化：控制中心懒加载',
+          description: '快速操作弹窗已采用按需加载，首屏 JS 体积减少 18%，交互响应更快。',
+        },
       ]
-      
+
       setSuggestions(mockSuggestions)
     } catch (error) {
       console.error('Failed to load suggestions:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const extendedWindow = window as ExtendedWindow
+    const idleCallback = extendedWindow.requestIdleCallback
+    if (typeof idleCallback === 'function') {
+      const id = idleCallback(() => loadSuggestions())
+      return () => extendedWindow.cancelIdleCallback?.(id)
+    }
+
+    const timer = setTimeout(() => loadSuggestions(), 100)
+    return () => clearTimeout(timer)
+  }, [loadSuggestions])
 
   const handleDismiss = (id: string) => {
     setDismissed(new Set([...dismissed, id]))
@@ -101,6 +132,10 @@ export function SmartSuggestions({ userId, className }: SmartSuggestionsProps) {
         return <Lightbulb className="h-5 w-5" />
       case 'goal':
         return <Sparkles className="h-5 w-5" />
+      case 'upgrade':
+        return <Rocket className="h-5 w-5" />
+      case 'performance':
+        return <Gauge className="h-5 w-5" />
     }
   }
 
@@ -114,6 +149,27 @@ export function SmartSuggestions({ userId, className }: SmartSuggestionsProps) {
         return 'text-yellow-500'
       case 'goal':
         return 'text-purple-500'
+      case 'upgrade':
+        return 'text-pink-500'
+      case 'performance':
+        return 'text-indigo-500'
+    }
+  }
+
+  const getGradient = (type: Suggestion['type']) => {
+    switch (type) {
+      case 'insight':
+        return 'from-sky-50 via-slate-50 to-white dark:from-sky-950/20 dark:to-slate-900/40'
+      case 'action':
+        return 'from-emerald-50 via-lime-50 to-white dark:from-emerald-950/20 dark:to-slate-900/40'
+      case 'tip':
+        return 'from-amber-50 via-orange-50 to-white dark:from-amber-900/30 dark:to-slate-900/40'
+      case 'goal':
+        return 'from-purple-50 via-pink-50 to-white dark:from-purple-900/30 dark:to-slate-900/40'
+      case 'upgrade':
+        return 'from-rose-50 via-fuchsia-50 to-white dark:from-rose-900/30 dark:to-slate-900/40'
+      case 'performance':
+        return 'from-indigo-50 via-blue-50 to-white dark:from-indigo-950/20 dark:to-slate-900/40'
     }
   }
 
@@ -157,8 +213,10 @@ export function SmartSuggestions({ userId, className }: SmartSuggestionsProps) {
           {visibleSuggestions.map((suggestion) => (
             <div
               key={suggestion.id}
-              className="group relative rounded-xl theme-bg-tertiary p-4 backdrop-blur-sm theme-border transition-all duration-200 hover:shadow-lg"
-              style={{ borderWidth: '1px' }}
+              className={cn(
+                'group relative rounded-2xl border border-white/60 bg-gradient-to-br p-4 backdrop-blur-xl transition-all duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-white/10',
+                getGradient(suggestion.type),
+              )}
             >
               <button
                 onClick={() => handleDismiss(suggestion.id)}
@@ -166,9 +224,9 @@ export function SmartSuggestions({ userId, className }: SmartSuggestionsProps) {
               >
                 <X className="h-4 w-4" />
               </button>
-              
+
               <div className="flex items-start gap-3">
-                <div className={cn('mt-0.5', getColor(suggestion.type))}>
+                <div className={cn('mt-0.5 rounded-2xl bg-white/60 p-3 shadow-inner', getColor(suggestion.type))}>
                   {getIcon(suggestion.type)}
                 </div>
                 <div className="flex-1">

@@ -51,7 +51,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
   if (projects.length === 0) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-gray-500">
+        <CardContent className="py-8 text-center theme-text-secondary">
           No projects yet. Add your first project!
         </CardContent>
       </Card>
@@ -125,52 +125,55 @@ export function ProjectsList({ projects }: ProjectsListProps) {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {project.description && (
-                <p className="text-sm text-gray-600 line-clamp-3">
-                  {project.description}
-                </p>
-              )}
+                  {project.description && (
+                    <p className="text-sm theme-text-secondary line-clamp-3">
+                      {project.description}
+                    </p>
+                  )}
 
-              {project.techStack && (
-                <div className="flex flex-wrap gap-1">
-                  {project.techStack.split(',').map((tech, i) => (
-                    <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded">
-                      {tech.trim()}
-                    </span>
-                  ))}
-                </div>
-              )}
+                  {project.techStack && (
+                    <div className="flex flex-wrap gap-1">
+                      {project.techStack.split(',').map((tech, i) => (
+                        <span
+                          key={i}
+                          className="text-xs rounded-full bg-white/60 px-3 py-1 theme-text-secondary dark:bg-white/10"
+                        >
+                          {tech.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
-              <div className="text-xs text-gray-500">
-                {project.startDate && (
-                  <div>Started: {format(new Date(project.startDate), 'MMM yyyy')}</div>
-                )}
+                  <div className="text-xs theme-text-tertiary">
+                    {project.startDate && (
+                      <div>Started: {format(new Date(project.startDate), 'MMM yyyy')}</div>
+                    )}
                 {project.endDate && (
                   <div>Completed: {format(new Date(project.endDate), 'MMM yyyy')}</div>
                 )}
               </div>
 
-              <div className="flex gap-2 pt-2">
-                {project.githubUrl && (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
-                  >
-                    <Github className="h-3 w-3" />
-                    Code
+                  <div className="flex gap-2 pt-2">
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs theme-color-primary hover:opacity-80"
+                      >
+                        <Github className="h-3 w-3" />
+                        Code
                   </a>
                 )}
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
-                  >
-                    <Globe className="h-3 w-3" />
-                    Live
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs theme-color-primary hover:opacity-80"
+                      >
+                        <Globe className="h-3 w-3" />
+                        Live
                   </a>
                 )}
                 {project.isPublic && (
