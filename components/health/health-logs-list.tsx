@@ -11,7 +11,7 @@ export function HealthLogsList({ logs }: HealthLogsListProps) {
   if (logs.length === 0) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-gray-500">
+        <CardContent className="py-8 text-center theme-text-secondary">
           No health logs yet
         </CardContent>
       </Card>
@@ -25,15 +25,15 @@ export function HealthLogsList({ logs }: HealthLogsListProps) {
           <CardContent className="py-4">
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <p className="font-medium">{format(new Date(log.date), 'MMM dd, yyyy')}</p>
-                <div className="flex gap-2 text-sm text-gray-600">
+                <p className="font-medium theme-text-primary">{format(new Date(log.date), 'MMM dd, yyyy')}</p>
+                <div className="flex gap-2 text-sm theme-text-secondary">
                   {log.sleepHours && <span>💤 {log.sleepHours}h</span>}
                   {log.exerciseMinutes && <span>🏃 {log.exerciseMinutes}min</span>}
                   {log.moodScore && <span>😊 {log.moodScore}/10</span>}
                   {log.energyScore && <span>⚡ {log.energyScore}/10</span>}
                 </div>
                 {log.remark && (
-                  <p className="text-sm text-gray-500 mt-2">{log.remark}</p>
+                  <p className="text-sm theme-text-tertiary mt-2">{log.remark}</p>
                 )}
               </div>
               {log.exerciseType && (

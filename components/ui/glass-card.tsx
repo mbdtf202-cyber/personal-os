@@ -31,7 +31,7 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        'rounded-[2rem] glass-card soft-shadow transition-all duration-300',
+        'rounded-[2rem] glass-card soft-shadow theme-border transition-all duration-300',
         hover &&
           'hover:-translate-y-1 hover:shadow-[0_25px_65px_rgba(79,70,229,0.15)] motion-safe:hover:animate-[float_6s_ease-in-out_infinite]',
         glow &&
@@ -39,7 +39,10 @@ export function GlassCard({
         className,
       )}
       style={{
-        ...(gradient !== 'none' ? { backgroundImage: gradients[gradient] } : {}),
+        ...(gradient !== 'none'
+          ? { backgroundImage: gradients[gradient] }
+          : { background: 'var(--glass-surface)' }),
+        borderWidth: '1px',
         ...style,
       }}
     >

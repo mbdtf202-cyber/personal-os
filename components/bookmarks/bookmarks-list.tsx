@@ -74,7 +74,7 @@ export function BookmarksList({ bookmarks }: BookmarksListProps) {
   if (bookmarks.length === 0) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-gray-500">
+        <CardContent className="py-8 text-center theme-text-secondary">
           No bookmarks yet. Add your first bookmark!
         </CardContent>
       </Card>
@@ -136,14 +136,14 @@ export function BookmarksList({ bookmarks }: BookmarksListProps) {
 
       {filteredBookmarks.length === 0 ? (
         <Card>
-          <CardContent className="py-8 text-center text-gray-500">
+          <CardContent className="py-8 text-center theme-text-secondary">
             No bookmarks found with selected filters
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {filteredBookmarks.map((bookmark) => (
-            <Card key={bookmark.id} className="hover:shadow-md transition-shadow">
+            <Card key={bookmark.id} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   {bookmark.faviconUrl && (
@@ -156,40 +156,40 @@ export function BookmarksList({ bookmarks }: BookmarksListProps) {
                       }}
                     />
                   )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <button
-                        onClick={() => handleVisit(bookmark.id, bookmark.url)}
-                        className="font-semibold text-primary hover:underline text-left line-clamp-2"
-                      >
-                        {bookmark.title}
-                      </button>
-                      <Badge variant={getStatusColor(bookmark.status) as any} className="flex-shrink-0">
-                        {bookmark.status}
-                      </Badge>
-                    </div>
-                    {bookmark.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                        {bookmark.description}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{getCategoryEmoji(bookmark.category)} {bookmark.category}</span>
-                      {bookmark.visitCount > 0 && (
-                        <>
-                          <span>•</span>
-                          <span>{bookmark.visitCount} visits</span>
-                        </>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <button
+                          onClick={() => handleVisit(bookmark.id, bookmark.url)}
+                          className="font-semibold theme-color-primary hover:opacity-80 text-left line-clamp-2"
+                        >
+                          {bookmark.title}
+                        </button>
+                        <Badge variant={getStatusColor(bookmark.status) as any} className="flex-shrink-0">
+                          {bookmark.status}
+                        </Badge>
+                      </div>
+                      {bookmark.description && (
+                        <p className="text-sm theme-text-secondary line-clamp-2 mb-2">
+                          {bookmark.description}
+                        </p>
                       )}
-                      <span>•</span>
-                      <a
-                        href={bookmark.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 hover:text-primary"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleVisit(bookmark.id, bookmark.url)
+                      <div className="flex items-center gap-2 text-xs theme-text-tertiary">
+                        <span>{getCategoryEmoji(bookmark.category)} {bookmark.category}</span>
+                        {bookmark.visitCount > 0 && (
+                          <>
+                            <span>•</span>
+                            <span>{bookmark.visitCount} visits</span>
+                          </>
+                        )}
+                        <span>•</span>
+                        <a
+                          href={bookmark.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 theme-color-primary hover:opacity-80"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleVisit(bookmark.id, bookmark.url)
                         }}
                       >
                         <ExternalLink className="h-3 w-3" />

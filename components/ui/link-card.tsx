@@ -72,7 +72,7 @@ export function LinkCard({
   }
 
   return (
-    <Card className={cn('hover:shadow-md transition-shadow', isRead && 'opacity-60', className)}>
+    <Card className={cn('hover:shadow-lg transition-shadow', isRead && 'opacity-60', className)}>
       <CardContent className="p-4">
         <div className="flex gap-4">
           {/* Preview Image or Placeholder */}
@@ -88,7 +88,7 @@ export function LinkCard({
               />
             </div>
           ) : faviconUrl && !faviconError ? (
-            <div className="flex-shrink-0 w-40 h-28 bg-secondary rounded flex items-center justify-center">
+            <div className="flex-shrink-0 w-40 h-28 rounded flex items-center justify-center" style={{ background: 'var(--bg-tertiary)' }}>
               <Image
                 src={faviconUrl}
                 alt=""
@@ -99,7 +99,7 @@ export function LinkCard({
               />
             </div>
           ) : (
-            <div className="flex-shrink-0 w-40 h-28 rounded bg-secondary/60" />
+            <div className="flex-shrink-0 w-40 h-28 rounded" style={{ background: 'var(--bg-tertiary)' }} />
           )}
 
           {/* Content */}
@@ -115,7 +115,7 @@ export function LinkCard({
                   onError={() => setFaviconError(true)}
                 />
               )}
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs theme-text-tertiary">
                 {siteName || domain}
               </span>
               {getTypeBadge() && (
@@ -128,7 +128,7 @@ export function LinkCard({
 
             {/* Title */}
             <h3
-              className="font-semibold line-clamp-2 mb-2 cursor-pointer hover:text-primary"
+              className="font-semibold line-clamp-2 mb-2 cursor-pointer theme-text-primary hover:opacity-80"
               onClick={onClick}
             >
               {title}
@@ -136,7 +136,7 @@ export function LinkCard({
 
             {/* Description */}
             {description && (
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+              <p className="text-sm theme-text-secondary line-clamp-2 mb-3">
                 {description}
               </p>
             )}
@@ -147,7 +147,7 @@ export function LinkCard({
                 {tags.slice(0, 5).map((tag, i) => (
                   <span
                     key={i}
-                    className="text-xs bg-secondary px-2 py-0.5 rounded"
+                    className="text-xs rounded-full bg-white/60 px-3 py-0.5 theme-text-secondary dark:bg-white/10"
                   >
                     #{tag}
                   </span>
@@ -161,7 +161,7 @@ export function LinkCard({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-xs theme-color-primary hover:opacity-80"
               >
                 <ExternalLink className="h-3 w-3" />
                 Visit

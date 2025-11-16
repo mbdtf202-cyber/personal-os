@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { GlassCard } from '@/components/ui/glass-card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { CreateWorkflowDialog } from '@/components/workflows/create-workflow-dialog'
 import { WorkflowCard } from '@/components/workflows/workflow-card'
-import { Plus, Sparkles, Zap, Clock, CheckCircle } from 'lucide-react'
+import { Plus, Sparkles, Zap, CheckCircle } from 'lucide-react'
+import { PageHeader } from '@/components/layout/page-header'
 
 export default function WorkflowsPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
@@ -100,14 +100,17 @@ export default function WorkflowsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold theme-text-primary mb-2">
-          工作流
-        </h1>
-        <p className="theme-text-secondary">
-          创建和管理你的自动化工作流程
-        </p>
-      </div>
+      <PageHeader
+        title="工作流"
+        description="创建和管理你的自动化流程，实时掌握执行情况。"
+        accent="iris"
+        actions={(
+          <Button onClick={() => setCreateDialogOpen(true)} className="theme-btn-primary">
+            <Plus className="h-4 w-4 mr-2" />
+            创建工作流
+          </Button>
+        )}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <GlassCard>
@@ -157,13 +160,6 @@ export default function WorkflowsPage() {
         <h2 className="text-xl font-semibold theme-text-primary">
           我的工作流
         </h2>
-        <Button
-          onClick={() => setCreateDialogOpen(true)}
-          className="theme-btn-primary"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          创建工作流
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
