@@ -45,7 +45,7 @@ export function AnalyticsOverview({ data, className }: AnalyticsOverviewProps) {
     <div className={cn('space-y-6', className)}>
       {/* 核心指标 */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <GlassCard hover gradient="blue">
+        <GlassCard hover gradient="aqua">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="rounded-xl bg-blue-500/10 p-3">
@@ -74,7 +74,7 @@ export function AnalyticsOverview({ data, className }: AnalyticsOverviewProps) {
           </div>
         </GlassCard>
 
-        <GlassCard hover gradient="purple">
+        <GlassCard hover gradient="lavender">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="rounded-xl bg-purple-500/10 p-3">
@@ -98,7 +98,7 @@ export function AnalyticsOverview({ data, className }: AnalyticsOverviewProps) {
           </div>
         </GlassCard>
 
-        <GlassCard hover gradient="orange">
+        <GlassCard hover gradient="sunset">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="rounded-xl bg-orange-500/10 p-3">
@@ -119,7 +119,7 @@ export function AnalyticsOverview({ data, className }: AnalyticsOverviewProps) {
           </div>
         </GlassCard>
 
-        <GlassCard hover gradient="green">
+        <GlassCard hover gradient="mint">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="rounded-xl bg-green-500/10 p-3">
