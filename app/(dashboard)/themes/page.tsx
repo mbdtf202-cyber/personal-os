@@ -19,56 +19,43 @@ import { PageHeader } from '@/components/layout/page-header'
 import { PageSection } from '@/components/layout/page-section'
 import { applyThemeToDOM } from '@/lib/themes/apply-theme'
 import { toast } from 'sonner'
+import { DEFAULT_THEME, THEME_CHANGE_EVENT, ThemeName, resolveThemeName, themeOptions } from '@/lib/themes/registry'
 
-const THEMES = [
-  {
-    id: 'minimal-light',
-    name: '极简白',
-    description: '简洁明快的极简风格',
-  },
-  {
-    id: 'soft-blue',
-    name: '柔和蓝',
-    description: '舒适专业的蓝色系',
-  },
-  {
-    id: 'fresh-green',
-    name: '清新绿',
-    description: '生机活力的绿色系',
-  },
-  {
-    id: 'elegant-purple',
-    name: '优雅紫',
-    description: '高端典雅的紫色系',
-  },
-  {
-    id: 'warm-beige',
-    name: '温暖米',
-    description: '温馨舒适的米色系',
-  },
-  {
-    id: 'deep-dark',
-    name: '深邃黑',
-    description: '沉浸体验的深色系',
-  },
-] as const
+const getInitialSelectedTheme = (): ThemeName => {
+  if (typeof document !== 'undefined') {
+    const datasetTheme = document.documentElement.dataset.theme
+    if (datasetTheme) {
+      return resolveThemeName(datasetTheme)
+    }
+  }
 
-type ThemeName = (typeof THEMES)[number]['id']
+  if (typeof window !== 'undefined') {
+    return resolveThemeName(localStorage.getItem('app-theme'))
+  }
+
+  return DEFAULT_THEME
+}
 
 export default function ThemesPage() {
-  const [selectedTheme, setSelectedTheme] = useState<ThemeName>('minimal-light')
+  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(() => getInitialSelectedTheme())
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
   useEffect(() => {
-    const saved = (localStorage.getItem('app-theme') as ThemeName) || 'minimal-light'
-    setSelectedTheme(saved)
+    const handleThemeBroadcast = (event: Event) => {
+      const detail = (event as CustomEvent<ThemeName>).detail
+      if (detail) {
+        setSelectedTheme(detail)
+      }
+    }
+
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeBroadcast as EventListener)
+    return () => window.removeEventListener(THEME_CHANGE_EVENT, handleThemeBroadcast as EventListener)
   }, [])
 
   const handleThemeChange = (themeId: ThemeName) => {
     setSelectedTheme(themeId)
     localStorage.setItem('app-theme', themeId)
     applyThemeToDOM(themeId)
-    const label = THEMES.find((theme) => theme.id === themeId)?.name
+    const label = themeOptions.find((theme) => theme.id === themeId)?.name
     toast.success(`主题已切换为 ${label}`)
   }
 
@@ -83,7 +70,7 @@ export default function ThemesPage() {
 
       <PageSection title="主题选择" description="点击即可实时预览，右上角也可随时切换">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-          {THEMES.map((theme) => (
+          {themeOptions.map((theme) => (
             <button
               key={theme.id}
               onClick={() => handleThemeChange(theme.id)}
@@ -97,6 +84,15 @@ export default function ThemesPage() {
                 {theme.name}
               </p>
               <p className="text-xs theme-text-secondary mt-1">{theme.description}</p>
+              <div className="flex items-center gap-1 mt-3" aria-hidden="true">
+                {Object.values(theme.colors).map((color) => (
+                  <span
+                    key={`${theme.id}-${color}`}
+                    className="h-2.5 w-6 rounded-full"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
             </button>
           ))}
         </div>

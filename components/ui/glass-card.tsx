@@ -20,11 +20,16 @@ export function GlassCard({
   style,
 }: GlassCardProps) {
   const gradients = {
-    iris: 'linear-gradient(135deg, rgba(254, 247, 255, 0.95) 0%, rgba(222, 213, 255, 0.95) 45%, rgba(205, 225, 255, 0.9) 100%)',
-    lavender: 'linear-gradient(135deg, rgba(244, 230, 255, 0.9) 0%, rgba(210, 210, 255, 0.95) 100%)',
-    sunset: 'linear-gradient(135deg, rgba(255, 234, 211, 0.95) 0%, rgba(255, 214, 236, 0.9) 100%)',
-    mint: 'linear-gradient(135deg, rgba(219, 248, 255, 0.9) 0%, rgba(217, 255, 230, 0.9) 100%)',
-    aqua: 'linear-gradient(135deg, rgba(226, 240, 255, 0.95) 0%, rgba(206, 220, 255, 0.85) 100%)',
+    iris:
+      'linear-gradient(135deg, var(--gradient-iris-start, rgba(254, 247, 255, 0.95)) 0%, var(--gradient-iris-end, rgba(205, 225, 255, 0.9)) 100%)',
+    lavender:
+      'linear-gradient(135deg, var(--gradient-lavender-start, rgba(244, 230, 255, 0.9)) 0%, var(--gradient-lavender-end, rgba(210, 210, 255, 0.95)) 100%)',
+    sunset:
+      'linear-gradient(135deg, var(--gradient-sunset-start, rgba(255, 234, 211, 0.95)) 0%, var(--gradient-sunset-end, rgba(255, 214, 236, 0.9)) 100%)',
+    mint:
+      'linear-gradient(135deg, var(--gradient-mint-start, rgba(219, 248, 255, 0.9)) 0%, var(--gradient-mint-end, rgba(217, 255, 230, 0.9)) 100%)',
+    aqua:
+      'linear-gradient(135deg, var(--gradient-aqua-start, rgba(226, 240, 255, 0.95)) 0%, var(--gradient-aqua-end, rgba(206, 220, 255, 0.85)) 100%)',
     none: '',
   }
 
