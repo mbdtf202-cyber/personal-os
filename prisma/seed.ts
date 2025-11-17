@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import { createPasswordHash } from '../lib/auth'
 
 const prisma = new PrismaClient()
@@ -12,12 +12,13 @@ async function main() {
 
   const user = await prisma.user.upsert({
     where: { email },
-    update: {},
+    update: { role: Role.ADMIN },
     create: {
       email,
       name,
       passwordHash,
       timezone: 'Asia/Shanghai',
+      role: Role.ADMIN,
     },
   })
 

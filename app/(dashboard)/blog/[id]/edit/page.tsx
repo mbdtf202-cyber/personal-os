@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { blogService } from '@/lib/services/blog'
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { BlogEditor } from '@/components/blog/blog-editor'
 
 export default async function EditPostPage({
@@ -8,7 +8,7 @@ export default async function EditPostPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const { id } = await params
   const post = await blogService.getPost(id)
 

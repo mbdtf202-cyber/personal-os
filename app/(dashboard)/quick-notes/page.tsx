@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { quickNotesService } from '@/lib/services/quick-notes'
 import { PageHeader } from '@/components/layout/page-header'
 import { PageSection } from '@/components/layout/page-section'
@@ -6,7 +6,7 @@ import { QuickNotesBoard } from '@/components/quick-notes/quick-notes-board'
 import type { QuickNoteDTO } from '@/components/quick-notes/types'
 
 export default async function QuickNotesPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const notes = await quickNotesService.getNotes(userId)
   const serializedNotes: QuickNoteDTO[] = notes.map((note) => ({
     id: note.id,

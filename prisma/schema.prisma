@@ -37,6 +37,11 @@ enum TrainingPlanStatus {
   PAUSED         // 已暂停
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
@@ -44,6 +49,7 @@ model User {
   passwordHash String?
   avatar    String?
   timezone  String    @default("Asia/Shanghai")
+  role      Role      @default(USER)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

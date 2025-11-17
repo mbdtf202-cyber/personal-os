@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         name: user.name,
         avatar: user.avatar,
         timezone: user.timezone,
+        role: user.role,
       },
     })
 

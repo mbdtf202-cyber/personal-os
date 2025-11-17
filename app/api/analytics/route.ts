@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth, UnauthorizedError } from '@/lib/auth'
 import { analyticsService } from '@/lib/services/analytics'
 
 export async function GET() {
@@ -9,6 +9,9 @@ export async function GET() {
     
     return NextResponse.json(analytics)
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: error.message }, { status: 401 })
+    }
     console.error('Analytics fetch failed:', error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },

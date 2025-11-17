@@ -1,6 +1,7 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'crypto';
+import type { Role } from '@prisma/client';
 import { prisma } from './prisma';
 import { NextResponse } from 'next/server';
 
@@ -10,6 +11,7 @@ export type AuthenticatedUser = {
   name: string;
   avatar: string | null;
   timezone: string;
+  role: Role;
 };
 
 const SESSION_COOKIE = 'pos_session';
@@ -98,6 +100,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
     name: user.name,
     avatar: user.avatar ?? null,
     timezone: user.timezone,
+    role: user.role,
   };
 }
 
@@ -106,46 +109,35 @@ export async function getCurrentUserId() {
   return session?.userId ?? null;
 }
 
-// 单用户模式 - 本地开发
-const DEFAULT_USER_ID = 'local-user'
-
-let userInitialized = false
-
-async function ensureDefaultUser() {
-  if (userInitialized) {
-    return DEFAULT_USER_ID
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: DEFAULT_USER_ID },
-    })
-
-    if (!user) {
-      await prisma.user.create({
-        data: {
-          id: DEFAULT_USER_ID,
-          email: 'user@local.dev',
-          name: 'Local User',
-          password: 'not-used',
-        },
-      })
-    }
-    
-    userInitialized = true
-  } catch (error) {
-    userInitialized = true
-  }
-
-  return DEFAULT_USER_ID
-}
-
 export async function requireAuth() {
-  return ensureDefaultUser()
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new UnauthorizedError();
+  }
+  return userId;
 }
 
 export async function requireApiAuth() {
-  return ensureDefaultUser()
+  return requireAuth();
+}
+
+export async function requirePageAuth() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect('/login');
+  }
+  return user;
+}
+
+export async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new UnauthorizedError();
+  }
+  if (user.role !== 'ADMIN') {
+    throw new UnauthorizedError('Admin privileges required');
+  }
+  return user;
 }
 
 export async function createSession(userId: string) {

@@ -1,4 +1,5 @@
 import { dashboardService } from '@/lib/services/dashboard'
+import { requirePageAuth } from '@/lib/auth'
 import { SmartSuggestions } from '@/components/ai/smart-suggestions'
 import { DashboardCards } from '@/components/dashboard/dashboard-cards'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
@@ -7,10 +8,8 @@ import { ExperienceRoadmap } from '@/components/dashboard/experience-roadmap'
 import { GlassCard } from '@/components/ui/glass-card'
 import { Sparkles, ShieldCheck, Wifi, Clock3 } from 'lucide-react'
 
-const DEFAULT_USER_ID = 'local-user'
-
 export default async function DashboardPage() {
-  const userId = DEFAULT_USER_ID
+  const { id: userId } = await requirePageAuth()
   const overview = await dashboardService.getTodayOverview(userId)
   const activity = await dashboardService.getRecentActivity(userId)
 

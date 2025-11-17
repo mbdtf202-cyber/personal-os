@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { tradingService } from '@/lib/services/trading'
 import { format } from 'date-fns'
 import { PageHeader } from '@/components/layout/page-header'
@@ -7,7 +7,7 @@ import { GlassCard } from '@/components/ui/glass-card'
 import { CreateTradeDialog } from '@/components/trading/create-trade-dialog'
 
 export default async function TradingPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const trades = await tradingService.getTrades(userId)
   const stats = await tradingService.getTradeStatistics(userId)
 

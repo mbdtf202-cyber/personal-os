@@ -1,6 +1,7 @@
 // API 错误处理
 import { NextResponse } from 'next/server'
 import { ZodError } from 'zod'
+import { UnauthorizedError } from '@/lib/auth'
 
 export class ApiError extends Error {
   constructor(
@@ -20,6 +21,13 @@ export function handleApiError(error: unknown) {
     return NextResponse.json(
       { error: error.message, code: error.code },
       { status: error.statusCode }
+    )
+  }
+
+  if (error instanceof UnauthorizedError) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 401 }
     )
   }
 

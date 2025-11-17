@@ -1,11 +1,11 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { socialService } from '@/lib/services/social'
 import { PageHeader } from '@/components/layout/page-header'
 import { SocialPostsBoard } from '@/components/social/social-posts-board'
 import { CreateSocialPostDialog } from '@/components/social/create-social-post-dialog'
 
 export default async function SocialPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const posts = await socialService.getSocialPosts(userId)
 
   return (

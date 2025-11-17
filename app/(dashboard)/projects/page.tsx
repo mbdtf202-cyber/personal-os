@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { projectsService } from '@/lib/services/projects'
 import { ProjectsList } from '@/components/projects/projects-list'
 import { CreateProjectDialog } from '@/components/projects/create-project-dialog'
@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { PageSection } from '@/components/layout/page-section'
 
 export default async function ProjectsPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const projects = await projectsService.getProjects(userId)
 
   return (

@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { bookmarksService } from '@/lib/services/bookmarks'
 import { BookmarksList } from '@/components/bookmarks/bookmarks-list'
 import { CreateBookmarkDialog } from '@/components/bookmarks/create-bookmark-dialog'
@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { PageSection } from '@/components/layout/page-section'
 
 export default async function BookmarksPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const bookmarks = await bookmarksService.getBookmarks(userId)
 
   return (
