@@ -63,6 +63,7 @@ model User {
   trainingProgress  TrainingProgress[]
   workflows         Workflow[]
   sessions          Session[]
+  quickNotes        QuickNote[]
 }
 
 model Session {
@@ -347,6 +348,21 @@ model Bookmark {
   @@index([userId, category])
   @@index([status, isFavorite])
   @@index([userId, type])
+}
+
+model QuickNote {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?
+  content   String
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, isPinned])
 }
 
 // Training System Models - Knowledge Base

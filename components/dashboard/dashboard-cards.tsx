@@ -11,6 +11,7 @@ import {
   TrendingUp,
   FolderKanban,
   Bookmark,
+  NotebookPen,
   ArrowRight,
 } from 'lucide-react'
 
@@ -51,10 +52,25 @@ interface DashboardCardsProps {
     bookmarks: {
       toReadCount: number
     }
+    quickNotes: {
+      todayCount: number
+      latest: {
+        id: string
+        title: string | null
+        content: string
+      } | null
+    }
   }
 }
 
 export function DashboardCards({ overview }: DashboardCardsProps) {
+  const latestSnippet = overview.quickNotes.latest
+    ? overview.quickNotes.latest.title || overview.quickNotes.latest.content
+    : null
+  const snippetText = latestSnippet
+    ? `“${latestSnippet.slice(0, 24)}${latestSnippet.length > 24 ? '…' : ''}”`
+    : '快速捕捉你的灵感'
+
   const cards = [
     {
       title: '健康追踪',
@@ -135,6 +151,17 @@ export function DashboardCards({ overview }: DashboardCardsProps) {
       gradient: 'sunset' as const,
       progress: Math.min(overview.bookmarks.toReadCount * 8, 90),
       href: '/bookmarks',
+    },
+    {
+      title: '随手记',
+      value: overview.quickNotes.todayCount,
+      unit: '条',
+      description: snippetText,
+      icon: NotebookPen,
+      chip: overview.quickNotes.todayCount > 0 ? '今日已记录' : '等待记录',
+      gradient: 'lavender' as const,
+      progress: Math.min(overview.quickNotes.todayCount * 30, 100),
+      href: '/quick-notes',
     },
   ]
 

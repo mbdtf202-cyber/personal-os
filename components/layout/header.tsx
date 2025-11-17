@@ -1,12 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/global-search'
 import { ThemeSelector } from '@/components/layout/theme-selector'
 import { NotificationCenter } from '@/components/notifications/notification-center'
-import { Download } from 'lucide-react'
+import { Download, NotebookPen } from 'lucide-react'
+import { QuickNoteDialog } from '@/components/quick-notes/quick-note-dialog'
 
 export function Header() {
+  const [quickNoteOpen, setQuickNoteOpen] = useState(false)
   const handleExport = async () => {
     try {
       const response = await fetch('/api/export?format=json')
@@ -39,6 +42,15 @@ export function Header() {
           <ThemeSelector />
           <NotificationCenter />
           <Button
+            variant="secondary"
+            size="sm"
+            className="h-10 rounded-2xl bg-white/80 text-slate-700 shadow-sm hover:bg-white dark:bg-white/10 dark:text-white"
+            onClick={() => setQuickNoteOpen(true)}
+          >
+            <NotebookPen className="h-4 w-4" />
+            <span className="hidden sm:inline">随手记</span>
+          </Button>
+          <Button
             variant="outline"
             size="sm"
             className="h-10 rounded-2xl bg-white/70 text-slate-700 shadow-sm hover:bg-white/90 dark:bg-white/10 dark:text-white"
@@ -50,6 +62,7 @@ export function Header() {
           </Button>
         </div>
       </div>
+      <QuickNoteDialog open={quickNoteOpen} onOpenChange={setQuickNoteOpen} />
     </header>
   )
 }

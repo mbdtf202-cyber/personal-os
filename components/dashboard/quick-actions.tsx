@@ -13,6 +13,7 @@ import {
   FolderKanban,
   TrendingUp,
   GraduationCap,
+  NotebookPen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -32,6 +33,10 @@ const QuickTradeDialog = dynamic(
   () => import('@/components/trading/quick-trade-dialog').then((mod) => ({ default: mod.QuickTradeDialog })),
   { ssr: false },
 )
+const QuickNoteDialog = dynamic(
+  () => import('@/components/quick-notes/quick-note-dialog').then((mod) => ({ default: mod.QuickNoteDialog })),
+  { ssr: false },
+)
 
 export function QuickActions() {
   const router = useRouter()
@@ -39,6 +44,7 @@ export function QuickActions() {
   const [bookmarkDialogOpen, setBookmarkDialogOpen] = useState(false)
   const [projectDialogOpen, setProjectDialogOpen] = useState(false)
   const [tradeDialogOpen, setTradeDialogOpen] = useState(false)
+  const [quickNoteDialogOpen, setQuickNoteDialogOpen] = useState(false)
 
   const quickActions = useMemo(
     () => [
@@ -83,6 +89,13 @@ export function QuickActions() {
         hint: '巩固知识',
         accent: 'from-purple-300/90 via-purple-400/80 to-pink-400/80',
         action: () => router.push('/training'),
+      },
+      {
+        name: '随手记',
+        icon: NotebookPen,
+        hint: '捕捉灵感',
+        accent: 'from-fuchsia-300/90 via-rose-300/80 to-orange-300/80',
+        action: () => setQuickNoteDialogOpen(true),
       },
     ],
     [router],
@@ -161,6 +174,15 @@ export function QuickActions() {
         onOpenChange={setTradeDialogOpen}
         onSuccess={() => {
           setTradeDialogOpen(false)
+          router.refresh()
+        }}
+      />
+
+      <QuickNoteDialog
+        open={quickNoteDialogOpen}
+        onOpenChange={setQuickNoteDialogOpen}
+        onSuccess={() => {
+          setQuickNoteDialogOpen(false)
           router.refresh()
         }}
       />

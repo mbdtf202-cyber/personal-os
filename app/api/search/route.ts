@@ -31,6 +31,7 @@ export async function GET(request: Request) {
         bookmarks: requestedTypes.has('bookmark') ? results.bookmarks : [],
         projects: requestedTypes.has('project') ? results.projects : [],
         training: requestedTypes.has('training') ? results.training : [],
+        quickNotes: requestedTypes.has('quickNote') ? results.quickNotes : [],
       }
 
       filtered.total =
@@ -38,7 +39,8 @@ export async function GET(request: Request) {
         filtered.news.length +
         filtered.bookmarks.length +
         filtered.projects.length +
-        filtered.training.length
+        filtered.training.length +
+        filtered.quickNotes.length
 
       return NextResponse.json(filtered)
     }

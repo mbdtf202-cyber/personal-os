@@ -5,7 +5,7 @@ import { cache } from '@/lib/cache'
 export class SearchService {
   async search(userId: string, query: string) {
     if (!query || query.length < 2) {
-      return { total: 0, blog: [], news: [], bookmarks: [], projects: [], training: [] }
+      return { total: 0, blog: [], news: [], bookmarks: [], projects: [], training: [], quickNotes: [] }
     }
 
     const cacheKey = `search:${userId}:${query}`
@@ -14,21 +14,23 @@ export class SearchService {
 
     const searchTerm = `%${query.toLowerCase()}%`
 
-    const [blog, news, bookmarks, projects, training] = await Promise.all([
+    const [blog, news, bookmarks, projects, training, quickNotes] = await Promise.all([
       this.searchBlog(userId, searchTerm),
       this.searchNews(userId, searchTerm),
       this.searchBookmarks(userId, searchTerm),
       this.searchProjects(userId, searchTerm),
       this.searchTraining(userId, searchTerm),
+      this.searchQuickNotes(userId, searchTerm),
     ])
 
     const results = {
-      total: blog.length + news.length + bookmarks.length + projects.length + training.length,
+      total: blog.length + news.length + bookmarks.length + projects.length + training.length + quickNotes.length,
       blog,
       news,
       bookmarks,
       projects,
       training,
+      quickNotes,
     }
 
     cache.set(cacheKey, results, 60)
@@ -115,6 +117,20 @@ export class SearchService {
     })
 
     return notes
+  }
+
+  private async searchQuickNotes(userId: string, searchTerm: string) {
+    return await prisma.quickNote.findMany({
+      where: {
+        userId,
+        OR: [
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { content: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      },
+      take: 10,
+      orderBy: { updatedAt: 'desc' },
+    })
   }
 }
 
