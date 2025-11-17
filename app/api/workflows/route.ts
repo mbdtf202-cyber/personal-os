@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-
-const DEFAULT_USER_ID = 'local-user'
+import { requireApiAuth, UnauthorizedError } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
+    const userId = await requireApiAuth()
     const workflows = await prisma.workflow.findMany({
-      where: { userId: DEFAULT_USER_ID },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       include: {
         _count: {
@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(workflows)
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: error.message }, { status: 401 })
+    }
     console.error('Failed to fetch workflows:', error)
     return NextResponse.json(
       { error: 'Failed to fetch workflows' },
@@ -28,11 +31,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    const userId = await requireApiAuth()
     const { name, description, steps, trigger, schedule } = body
 
     const workflow = await prisma.workflow.create({
       data: {
-        userId: DEFAULT_USER_ID,
+        userId,
         name,
         description,
         steps: JSON.stringify(steps),
@@ -44,6 +48,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(workflow)
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: error.message }, { status: 401 })
+    }
     console.error('Failed to create workflow:', error)
     return NextResponse.json(
       { error: 'Failed to create workflow' },

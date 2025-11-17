@@ -1,5 +1,6 @@
 // 测试工具
 import { prisma } from './prisma'
+import { createPasswordHash } from './auth'
 
 export async function createTestUser(overrides?: Partial<any>) {
   return prisma.user.create({
@@ -7,7 +8,8 @@ export async function createTestUser(overrides?: Partial<any>) {
       id: `test-user-${Date.now()}`,
       email: `test-${Date.now()}@example.com`,
       name: 'Test User',
-      password: 'test-password',
+      passwordHash: createPasswordHash('test-password'),
+      role: 'USER',
       ...overrides,
     },
   })

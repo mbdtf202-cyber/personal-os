@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth, UnauthorizedError } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
@@ -98,6 +98,9 @@ export async function GET() {
       heatmap,
     })
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: error.message }, { status: 401 })
+    }
     console.error('Failed to fetch dashboard stats:', error)
     return NextResponse.json(
       { error: 'Failed to fetch stats' },

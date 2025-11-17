@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { healthService } from '@/lib/services/health'
 import { HabitsList } from '@/components/health/habits-list'
 import { CreateHabitDialog } from '@/components/health/create-habit-dialog'
@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export default async function HabitsPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const habits = await healthService.getHabits(userId)
 
   return (

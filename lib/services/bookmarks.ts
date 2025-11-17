@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { UnauthorizedError } from '@/lib/auth'
 
 export class BookmarksService {
   async getBookmarks(userId: string, filters?: {
@@ -42,7 +43,15 @@ export class BookmarksService {
     })
   }
 
-  async recordVisit(id: string) {
+  async recordVisit(id: string, userId: string) {
+    const bookmark = await prisma.bookmark.findFirst({
+      where: { id, userId },
+    })
+
+    if (!bookmark) {
+      throw new UnauthorizedError('Bookmark not found or access denied')
+    }
+
     return prisma.bookmark.update({
       where: { id },
       data: {

@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { healthService } from '@/lib/services/health'
 import { subDays } from 'date-fns'
 import { HealthLogForm } from '@/components/health/health-log-form'
@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { PageSection } from '@/components/layout/page-section'
 
 export default async function HealthPage() {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   
   const endDate = new Date()
   const startDate = subDays(endDate, 30)

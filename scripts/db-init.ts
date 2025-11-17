@@ -1,6 +1,7 @@
 // 数据库初始化脚本
 import { prisma } from '@/lib/prisma'
 import { logger } from '@/lib/logger'
+import { createPasswordHash } from '@/lib/auth'
 
 async function main() {
   try {
@@ -21,7 +22,8 @@ async function main() {
           id: 'local-user',
           email: 'user@local.dev',
           name: 'Local User',
-          password: 'not-used',
+          passwordHash: createPasswordHash('ChangeMe123!'),
+          role: 'ADMIN',
         },
       })
       logger.info('✅ Default user created')

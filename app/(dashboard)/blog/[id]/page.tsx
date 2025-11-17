@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth'
+import { requirePageAuth } from '@/lib/auth'
 import { blogService } from '@/lib/services/blog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -7,7 +7,7 @@ import { format } from 'date-fns'
 import { notFound } from 'next/navigation'
 
 export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const userId = await requireAuth()
+  const { id: userId } = await requirePageAuth()
   const { id } = await params
   const post = await blogService.getPostById(id, userId)
 

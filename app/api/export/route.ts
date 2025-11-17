@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth, UnauthorizedError } from '@/lib/auth'
 import { dataExportService } from '@/lib/services/data-export'
 
 export async function GET(request: NextRequest) {
@@ -42,6 +42,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: error.message }, { status: 401 })
+    }
     console.error('Export failed:', error)
     return NextResponse.json(
       { error: 'Failed to export data' },
