@@ -15,6 +15,7 @@ import {
   Bookmark,
   GraduationCap,
   Sparkles,
+  NotebookPen,
   Menu,
   X,
 } from 'lucide-react'
@@ -23,6 +24,7 @@ import { Button } from '@/components/ui/button'
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Workflows', href: '/workflows', icon: Sparkles },
+  { name: 'Quick Notes', href: '/quick-notes', icon: NotebookPen },
   { name: 'Training', href: '/training', icon: GraduationCap },
   { name: 'Health', href: '/health', icon: Heart },
   { name: 'Blog', href: '/blog', icon: FileText },

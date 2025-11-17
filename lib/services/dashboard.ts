@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { startOfDay, endOfDay } from 'date-fns'
+import { quickNotesService } from '@/lib/services/quick-notes'
 
 export class DashboardService {
   async getTodayOverview(userId: string) {
@@ -16,6 +17,7 @@ export class DashboardService {
       activeTrades,
       activeProjects,
       toReadBookmarks,
+      quickNotes,
     ] = await Promise.all([
       prisma.healthDailyLog.findFirst({
         where: {
@@ -85,6 +87,7 @@ export class DashboardService {
           status: 'TO_READ',
         },
       }),
+      quickNotesService.getOverview(userId),
     ])
 
     const pendingHabitsCount = pendingHabits.filter(h => h.checkins.length === 0).length
@@ -113,6 +116,7 @@ export class DashboardService {
       bookmarks: {
         toReadCount: toReadBookmarks,
       },
+      quickNotes,
     }
   }
 

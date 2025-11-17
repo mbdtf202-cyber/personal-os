@@ -10,15 +10,16 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Search, FileText, Newspaper, Bookmark, FolderKanban } from 'lucide-react'
+import { Search, FileText, Newspaper, Bookmark, FolderKanban, NotebookPen } from 'lucide-react'
 import { useDebounce } from '@/hooks/use-debounce'
 
-type SearchResultType = 'blog' | 'news' | 'bookmark' | 'project'
+type SearchResultType = 'blog' | 'news' | 'bookmark' | 'project' | 'quickNote'
 
 type BlogResult = { id: string; title: string; status: string }
 type NewsResult = { id: string; title: string; source: { name: string } }
 type BookmarkResult = { id: string; title: string; description: string | null }
 type ProjectResult = { id: string; title: string; status: string }
+type QuickNoteResult = { id: string; title: string | null; content: string }
 
 type SearchResponse = {
   total: number
@@ -26,6 +27,7 @@ type SearchResponse = {
   news: NewsResult[]
   bookmarks: BookmarkResult[]
   projects: ProjectResult[]
+  quickNotes: QuickNoteResult[]
 }
 
 export function GlobalSearch() {
@@ -89,6 +91,9 @@ export function GlobalSearch() {
       case 'project':
         router.push('/projects')
         break
+      case 'quickNote':
+        router.push('/quick-notes')
+        break
     }
   }
 
@@ -102,6 +107,8 @@ export function GlobalSearch() {
         return <Bookmark className="h-4 w-4" />
       case 'project':
         return <FolderKanban className="h-4 w-4" />
+      case 'quickNote':
+        return <NotebookPen className="h-4 w-4" />
       default:
         return <Search className="h-4 w-4" />
     }
@@ -251,6 +258,34 @@ export function GlobalSearch() {
                               <Badge variant="outline" className="mt-2 rounded-full theme-border px-2 text-[11px] theme-text-secondary" style={{ borderWidth: '1px' }}>
                                 {item.status}
                               </Badge>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {results.quickNotes.length > 0 && (
+                  <div>
+                    <h3 className="mb-3 text-sm font-semibold theme-text-secondary">Quick Notes</h3>
+                    <div className="space-y-2">
+                      {results.quickNotes.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleResultClick('quickNote', item.id)}
+                          className="w-full rounded-2xl theme-border theme-bg-tertiary p-4 text-left transition hover:-translate-y-0.5 theme-shadow-sm"
+                          style={{ borderWidth: '1px' }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl theme-btn-info">
+                              {getIcon('quickNote')}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium theme-text-primary">{item.title || '未命名随手记'}</p>
+                              <p className="mt-2 text-xs theme-text-tertiary line-clamp-1">
+                                {item.content}
+                              </p>
                             </div>
                           </div>
                         </button>
