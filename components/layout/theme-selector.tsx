@@ -10,62 +10,29 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { applyThemeToDOM } from '@/lib/themes/apply-theme'
-
-type ThemeName = 'minimal-light' | 'soft-blue' | 'fresh-green' | 'elegant-purple' | 'warm-beige' | 'deep-dark'
-
-const THEMES: Array<{
-  id: ThemeName
-  name: string
-  description: string
-  colors: { primary: string; secondary: string; accent: string }
-}> = [
-  {
-    id: 'minimal-light',
-    name: '极简白',
-    description: '简洁明快',
-    colors: { primary: '#007AFF', secondary: '#F5F5F5', accent: '#34C759' },
-  },
-  {
-    id: 'soft-blue',
-    name: '柔和蓝',
-    description: '舒适专业',
-    colors: { primary: '#0EA5E9', secondary: '#F1F5F9', accent: '#10B981' },
-  },
-  {
-    id: 'fresh-green',
-    name: '清新绿',
-    description: '生机活力',
-    colors: { primary: '#16A34A', secondary: '#F7FEF5', accent: '#22C55E' },
-  },
-  {
-    id: 'elegant-purple',
-    name: '优雅紫',
-    description: '高端典雅',
-    colors: { primary: '#A855F7', secondary: '#F5F3F9', accent: '#8B5CF6' },
-  },
-  {
-    id: 'warm-beige',
-    name: '温暖米',
-    description: '温馨舒适',
-    colors: { primary: '#D97706', secondary: '#FEF9F5', accent: '#B45309' },
-  },
-  {
-    id: 'deep-dark',
-    name: '深邃黑',
-    description: '沉浸体验',
-    colors: { primary: '#38BDF8', secondary: '#1E293B', accent: '#4ADE80' },
-  },
-]
+import { DEFAULT_THEME, THEME_CHANGE_EVENT, ThemeName, resolveThemeName, themeOptions } from '@/lib/themes/registry'
 
 export function ThemeSelector() {
-  const [currentTheme, setCurrentTheme] = useState<ThemeName>('minimal-light')
+  const [currentTheme, setCurrentTheme] = useState<ThemeName>(DEFAULT_THEME)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const savedTheme = (localStorage.getItem('app-theme') as ThemeName) || 'minimal-light'
+    const savedTheme = resolveThemeName(localStorage.getItem('app-theme'))
     setCurrentTheme(savedTheme)
     applyThemeToDOM(savedTheme)
+  }, [])
+
+  useEffect(() => {
+    const handleThemeBroadcast = (event: Event) => {
+      const detail = (event as CustomEvent<ThemeName>).detail
+      if (detail) {
+        setCurrentTheme(detail)
+      }
+    }
+
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeBroadcast as EventListener)
+    return () => window.removeEventListener(THEME_CHANGE_EVENT, handleThemeBroadcast as EventListener)
   }, [])
 
   const handleThemeChange = (themeName: ThemeName) => {
@@ -78,7 +45,8 @@ export function ThemeSelector() {
     return null
   }
 
-  const activeTheme = THEMES.find(t => t.id === currentTheme)
+  const themes = themeOptions
+  const activeTheme = themes.find(t => t.id === currentTheme)
 
   return (
     <DropdownMenu>
@@ -104,7 +72,7 @@ export function ThemeSelector() {
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          {THEMES.map((theme) => (
+          {themes.map((theme) => (
             <button
               key={theme.id}
               onClick={() => handleThemeChange(theme.id)}
