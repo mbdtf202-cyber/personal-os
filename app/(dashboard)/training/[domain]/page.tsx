@@ -67,17 +67,17 @@ export default function DomainPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const fetchDomainData = useCallback(async () => {
-    if (!domainSlug) return;
+    if (!normalizedDomain) return;
 
     setLoading(true);
     setLoadError(null);
     try {
       const [statsRes, notesRes, snippetsRes, resourcesRes, bugsRes] = await Promise.all([
-        fetch(`/api/training/${domainSlug}/stats`),
-        fetch(`/api/training/${domainSlug}/notes`),
-        fetch(`/api/training/${domainSlug}/snippets`),
-        fetch(`/api/training/${domainSlug}/resources`),
-        fetch(`/api/training/${domainSlug}/bugs`),
+        fetch(`/api/training/${normalizedDomain}/stats`),
+        fetch(`/api/training/${normalizedDomain}/notes`),
+        fetch(`/api/training/${normalizedDomain}/snippets`),
+        fetch(`/api/training/${normalizedDomain}/resources`),
+        fetch(`/api/training/${normalizedDomain}/bugs`),
       ]);
 
       if (!statsRes.ok) throw new Error("加载统计信息失败");
@@ -98,7 +98,7 @@ export default function DomainPage() {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [domainSlug]);
+  }, [normalizedDomain]);
 
   useEffect(() => {
     void fetchDomainData();
