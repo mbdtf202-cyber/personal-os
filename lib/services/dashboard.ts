@@ -121,7 +121,7 @@ export class DashboardService {
   }
 
   async getRecentActivity(userId: string, limit: number = 10) {
-    const [recentPosts, recentTrades, recentProjects] = await Promise.all([
+    const [recentPosts, rawTrades, recentProjects] = await Promise.all([
       prisma.post.findMany({
         where: { userId },
         orderBy: { updatedAt: 'desc' },
@@ -156,6 +156,11 @@ export class DashboardService {
         },
       }),
     ])
+
+    const recentTrades = rawTrades.map(t => ({
+      ...t,
+      pnl: t.pnl.toNumber()
+    }))
 
     return {
       posts: recentPosts,

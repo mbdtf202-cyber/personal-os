@@ -61,8 +61,8 @@ export default async function TradingPage() {
                     <td className="p-4">{format(new Date(trade.date), 'yyyy-MM-dd')}</td>
                     <td className="p-4 font-semibold theme-text-primary">{trade.symbol}</td>
                     <td className="p-4 uppercase theme-text-secondary">{trade.direction}</td>
-                    <td className={`p-4 text-right font-semibold ${Number(trade.pnl) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                      ${Number(trade.pnl).toFixed(2)}
+                    <td className={`p-4 text-right font-semibold ${trade.pnl.toNumber() >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      ${trade.pnl.toNumber().toFixed(2)}
                     </td>
                   </tr>
                 ))}

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 import { subDays } from 'date-fns'
 
 export class TradingService {
@@ -45,19 +46,24 @@ export class TradingService {
 
   async getTradeStatistics(userId: string, days: number = 30) {
     const startDate = subDays(new Date(), days)
-    
+
     const trades = await prisma.trade.findMany({
       where: {
         userId,
         date: { gte: startDate },
       },
     })
-    
-    const totalPnl = trades.reduce((sum, t) => sum + Number(t.pnl), 0)
-    const winningTrades = trades.filter(t => Number(t.pnl) > 0).length
+
+    // Use Decimal for precision
+    const totalPnl = trades.reduce((sum, t) => sum.plus(t.pnl), new Prisma.Decimal(0))
+    const winningTrades = trades.filter(t => t.pnl.isPositive()).length
     const winRate = trades.length > 0 ? (winningTrades / trades.length) * 100 : 0
-    
-    return { totalPnl, winRate, totalTrades: trades.length }
+
+    return {
+      totalPnl: totalPnl.toNumber(),
+      winRate,
+      totalTrades: trades.length
+    }
   }
 
   async createTradingSummary(userId: string, data: {
@@ -77,7 +83,7 @@ export class TradingService {
 
   async getTradingSummaries(userId: string, days: number = 30) {
     const startDate = subDays(new Date(), days)
-    
+
     return prisma.tradingDailySummary.findMany({
       where: {
         userId,

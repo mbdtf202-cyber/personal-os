@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AppProviders } from "@/components/providers/app-providers";
 import { ThemeScript } from "./theme-script";
+import { DialogProvider } from "@/components/providers/dialog-provider";
+import { MobileFAB } from "@/components/layout/mobile-fab";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +20,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Personal OS",
   description: "Your personal management system",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Personal OS",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#3b82f6",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -36,6 +51,8 @@ export default function RootLayout({
       >
         <AppProviders>
           {children}
+          <DialogProvider />
+          <MobileFAB />
           <Toaster />
         </AppProviders>
       </body>
